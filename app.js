@@ -24,9 +24,16 @@
     openMinutes: 15 * 60,                     // 3:00 PM
     closeMinutes: 22 * 60 + 30                // 10:30 PM
   };
+// Configurar DRACOLoader
+const dracoLoader = new THREE.DRACOLoader();
+dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
 
+// Asignarlo a tu GLTFLoader
+const loader = new THREE.GLTFLoader();
+loader.setDRACOLoader(dracoLoader);
   /* Productos que existen en 3D (escena cinematográfica + estudio) */
   const PRODUCTS = {
+     
     crepa: {
       name: 'Crepa Gourmet', icon: '🥞', short: 'Nutella, fresas y menta',
       title: 'Crepa París Nutella & Fresas', price: 85, priceLabel: 'Desde $85', accent: '#FF2A6D', img: './crepa.png',
