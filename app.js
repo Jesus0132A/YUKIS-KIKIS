@@ -872,14 +872,18 @@
   function whenModel(fn) { if (model.status === 'loading') modelSubs.done.push(fn); else fn(model); }
   function onModelProgress(fn) { modelSubs.progress.push(fn); }
 
-  function loadCrepaModel() {
+ function loadCrepaModel() {
   if (typeof THREE === 'undefined' || typeof THREE.GLTFLoader !== 'function') { settleModel('failed'); return; }
 
-  const dracoLoader = new THREE.DRACOLoader();
-  dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/draco/gltf/');
-
+  // Usar el cargador GLTF estándar con el archivo comprimido
   const loader = new THREE.GLTFLoader();
-  loader.setDRACOLoader(dracoLoader);
+  
+  // Si Three.js soporta DRACOLoader de forma nativa en este CDN, lo configuramos
+  if (typeof THREE.DRACOLoader !== 'undefined') {
+    const dracoLoader = new THREE.DRACOLoader();
+    dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+    loader.setDRACOLoader(dracoLoader);
+  }
 
   loader.load(
     CONFIG.modelPath,
