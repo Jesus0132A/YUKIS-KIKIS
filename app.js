@@ -873,23 +873,23 @@
   function onModelProgress(fn) { modelSubs.progress.push(fn); }
 
   function loadCrepaModel() {
-    if (typeof THREE === 'undefined' || typeof THREE.GLTFLoader !== 'function') { settleModel('failed'); return; }
-    
-    const dracoLoader = new THREE.DRACOLoader();
-    dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
-    
-    const loader = new THREE.GLTFLoader();
-    loader.setDRACOLoader(dracoLoader);
-    
-    loader.load(
-        CONFIG.modelPath,
-        (gltf) => { model.src = gltf.scene; settleModel('ready'); },
-        (xhr) => { modelSubs.progress.forEach((fn) => fn(xhr)); },
-        (err) => {
-            console.warn(`[Yukis Kikis] No se pudo cargar ${CONFIG.modelPath}. Se muestra la crepa de respaldo.`, err && err.message ? err.message : '');
-            settleModel('failed');
-        }
-    );
+  if (typeof THREE === 'undefined' || typeof THREE.GLTFLoader !== 'function') { settleModel('failed'); return; }
+
+  const dracoLoader = new THREE.DRACOLoader();
+  dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/draco/gltf/');
+
+  const loader = new THREE.GLTFLoader();
+  loader.setDRACOLoader(dracoLoader);
+
+  loader.load(
+    CONFIG.modelPath,
+    (gltf) => { model.src = gltf.scene; settleModel('ready'); },
+    (xhr) => { modelSubs.progress.forEach((fn) => fn(xhr)); },
+    (err) => {
+      console.warn(`[Yukis Kikis] No se pudo cargar ${CONFIG.modelPath}. Se muestra la crepa de respaldo.`, err && err.message ? err.message : '');
+      settleModel('failed');
+    }
+  );
 }
 
 
