@@ -875,10 +875,9 @@
  function loadCrepaModel() {
   if (typeof THREE === 'undefined' || typeof THREE.GLTFLoader !== 'function') { settleModel('failed'); return; }
 
-  // Usar el cargador GLTF estándar con el archivo comprimido
   const loader = new THREE.GLTFLoader();
   
-  // Si Three.js soporta DRACOLoader de forma nativa en este CDN, lo configuramos
+  // Configuramos el descompresor Draco para archivos comprimidos
   if (typeof THREE.DRACOLoader !== 'undefined') {
     const dracoLoader = new THREE.DRACOLoader();
     dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
@@ -895,8 +894,6 @@
     }
   );
 }
-
-
   /* ==========================================================================
      ESCENA CINEMATOGRÁFICA (hero + detalle + selector) · lienzo fijo #webgl
      La cámara entra al local y recorre el producto con GSAP ScrollTrigger
