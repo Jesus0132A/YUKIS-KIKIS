@@ -1,575 +1,364 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-MX">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Yukis Kikis | El verdadero antojo está aquí · Monterrey, N.L.</title>
-  <meta name="description" content="Yukis Kikis en Monterrey, N.L.: yukis de nieve artesanal, crepas gourmet, waffles belgas y fresas con crema. Explora el estudio 3D, arma tu antojo y pide por WhatsApp." />
-  <meta name="theme-color" content="#0F0F12" />
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="Yukis Kikis · El verdadero antojo está aquí" />
-  <meta property="og:description" content="Yukis, crepas, waffles y fresas con crema en Monterrey. Estudio 3D interactivo y pedidos por WhatsApp." />
-  <meta property="og:image" content="./logo.png" />
-  <link rel="icon" type="image/png" href="./logo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Yukis Kikis · Crepas, Waffles y Yukis en Monterrey</title>
+  <meta name="description" content="Yukis Kikis, Monterrey N.L.: crepas gourmet, waffles belgas, fresas con crema y Yukis. Arma tu antojo, agrega al carrito y pídelo por WhatsApp. Martes a Domingo de 3:00 PM a 10:30 PM." />
+  <meta name="theme-color" content="#0038E2" />
+  <link rel="icon" href="./logo-2.jpeg" />
 
-  <!-- Google Fonts: Inter / Montserrat / Poppins -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-
-  <!-- Font Awesome 6 -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
- <link rel="stylesheet" href="./styles.css" />
-    <!-- Librería DracoLoader para descomprimir modelos .glb optimizados -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="./styles.css" />
 </head>
+<body>
 
-<body class="is-loading">
+  <a class="skip" href="#menu">Saltar al contenido</a>
 
-  <!-- ============ PRELOADER ============ -->
-  <div id="loader" role="status" aria-live="polite">
-    <div class="loader-inner">
-      <div class="loader-logo"><img src="./logo.png" alt="Yukis Kikis" /></div>
-      <p class="loader-title">Entrando a Yukis Kikis</p>
-      <div class="loader-track"><div id="loader-bar"></div></div>
-      <span id="loader-pct">0%</span>
-    </div>
-  </div>
-
-  <div id="scroll-progress" aria-hidden="true"></div>
-
-  <!-- Lienzo WebGL fijo (escena cinematográfica) -->
-  <canvas id="webgl" aria-label="Escena 3D cinematográfica de los postres de Yukis Kikis" role="img"></canvas>
-  <div class="vignette" aria-hidden="true"></div>
-  <div class="grain" aria-hidden="true"></div>
-
-  <!-- ============ HEADER / NAV ============ -->
+  <!-- ============ HEADER / NAVBAR FIJO ============ -->
   <header class="nav" id="nav">
-    <a href="#hero" class="nav-brand" aria-label="Yukis Kikis, inicio">
-      <span class="nav-logo"><img src="./logo.png" alt="" /></span>
-      <span class="nav-name">Yukis <b>Kikis</b></span>
-    </a>
+    <div class="nav-inner">
+      <a class="brand" href="#inicio" aria-label="Yukis Kikis, ir al inicio">
+        <img src="./logo-2.jpeg" onerror="this.onerror=null;this.src='./logo.png'" alt="Logotipo Yukis Kikis" width="46" height="46" />
+        <span class="brand-name">Yukis<b>Kikis</b></span>
+      </a>
 
-    <nav class="nav-links" id="nav-links" aria-label="Principal">
-      <a href="#hero">Inicio</a>
-      <a href="#estudio-3d">Estudio 3D</a>
-      <a href="#galeria">Galería</a>
-      <a href="#menu">Menú</a>
-      <a href="#arma-antojo">Personalizar</a>
-      <a href="#historia">Nuestra Marca</a>
-      <a href="#contacto">Ubicación</a>
-    </nav>
+      <nav class="nav-links" id="nav-links" aria-label="Navegación principal">
+        <a href="#inicio" data-spy="inicio">Inicio</a>
+        <a href="#menu" data-spy="menu">Menú</a>
+        <a href="#personaliza" data-spy="personaliza">Arma tu Antojo</a>
+        <a href="#marca" data-spy="marca">Nuestra Marca</a>
+        <a href="#horario" data-spy="horario">Horario</a>
+        <a href="#ubicacion" data-spy="ubicacion">Ubicación</a>
+        <a class="nav-cta-mobile" href="#" data-wa="¡Hola Yukis Kikis! Quiero hacer un pedido 🧇">
+          <i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Pedir por WhatsApp
+        </a>
+      </nav>
 
-    <div class="nav-actions">
-      <button class="btn btn-green btn-sm nav-cta" data-wa="Quiero ver el menú de hoy y hacer un pedido." type="button">
-        <i class="fa-brands fa-whatsapp"></i><span>Pedir</span>
+      <button type="button" class="cart-btn" id="cart-open" data-cart-open aria-label="Abrir carrito" aria-haspopup="dialog">
+        <svg class="cart-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2.2l2.2 10.2a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 1.9-1.4L20.5 8H6.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="20" r="1.6" fill="currentColor"/><circle cx="17" cy="20" r="1.6" fill="currentColor"/></svg>
+        <span class="cart-count" id="cart-count" aria-live="polite">0</span>
       </button>
-      <button class="nav-burger" id="nav-burger" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav-links">
-        <i class="fa-solid fa-bars"></i>
+      <a class="btn btn-red nav-cta" href="#" data-wa="¡Hola Yukis Kikis! Quiero hacer un pedido 🧇">
+        <i class="fa-brands fa-whatsapp" aria-hidden="true"></i><span>Pedir</span>
+      </a>
+      <button type="button" class="burger" id="burger" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav-links">
+        <span></span><span></span><span></span>
       </button>
     </div>
+    <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
   </header>
 
-  <main>
-    <div id="story">
+  <main id="top">
 
-      <!-- ============ 1. HERO CINEMATOGRÁFICO ============ -->
-      <section id="hero" class="hero">
-        <div class="hero-top">
-          <p class="hero-eyebrow" data-hero="fade"><span class="dot"></span>Postres artesanales · Monterrey, N.L.</p>
-          <h1 class="hero-title" aria-label="Yukis Kikis">
-            <span class="hero-line" data-split>YUKIS</span>
-            <span class="hero-line hero-line-pink" data-split>KIKIS</span>
-          </h1>
-          <p class="hero-tag" data-hero="fade">El verdadero antojo <span class="text-green">está aquí.</span></p>
-        </div>
+    <!-- ============ HERO · VIDEO A PANTALLA COMPLETA CONTROLADO POR SCROLL (400vh) ============ -->
+    <section class="hero" id="inicio" aria-label="Presentación de Yukis Kikis">
+      <div class="hero-sticky" id="hero-sticky">
 
-        <div class="hero-bottom">
-          <p class="hero-sub" data-hero="fade">
-            Yukis de nieve, crepas gourmet, waffles belgas y fresas con crema.
-            Fruta real, sabor de verdad.
-          </p>
-          <div class="hero-cta" data-hero="fade">
-            <a href="#estudio-3d" class="btn btn-pink"><i class="fa-solid fa-cube"></i><span>Explorar en 3D</span></a>
-            <a href="#arma-antojo" class="btn btn-ghost"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Arma tu antojo</span></a>
+        <!-- El video ocupa toda la pantalla, centrado y sin filtros que lo oscurezcan -->
+        <!-- El src lo asigna app.js al cargar: elige al azar entre video_crepa_2.mp4 y video_yuki.mp4 -->
+        <video id="scroll-video" class="hero-fullscreen-video"
+               muted playsinline webkit-playsinline preload="auto" disablepictureinpicture disableremoteplayback
+               aria-label="Video de postres Yukis Kikis que avanza mientras haces scroll"></video>
+        <!-- Respaldo si el video no carga: la foto real, también a pantalla completa -->
+        <img class="hero-fullscreen-fallback" id="video-fallback" src="./crepa_2.png" alt="Crepa gourmet de Yukis Kikis" />
+
+        <!-- Solo un degradado radial sutil detrás del texto (el centro queda libre) -->
+        <div class="hero-scrim" aria-hidden="true"></div>
+
+        <div class="hero-copy">
+          <p class="hero-kicker"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Monterrey, N.L.</p>
+          <div class="hero-beats" id="hero-beats">
+            <h1 class="beat is-on" data-beat="0">El verdadero <span class="hl-yellow">antojo</span><br />está aquí.</h1>
+            <h2 class="beat" data-beat="1">Crepas y waffles<br /><span class="hl-pink">hechos al momento.</span></h2>
+            <h2 class="beat" data-beat="2">Fruta fresca, nieve<br /><span class="hl-yellow">y mucho sabor.</span></h2>
+            <h2 class="beat" data-beat="3">¿Se te antojó?<br /><span class="hl-pink">¡Pídelo ya!</span></h2>
           </div>
-          <div class="scroll-hint" data-hero="fade" aria-hidden="true">
-            <span>Desliza para entrar</span><i class="fa-solid fa-chevron-down"></i>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============ 2. DETALLE DEL PRODUCTO EN SCROLL ============ -->
-      <section id="detalle" class="detail">
-        <div class="sticky-wrap">
-
-          <div class="panel-slot slot-left">
-            <article class="panel panel-a">
-              <span class="chip chip-pink"><i class="fa-solid fa-fire-flame-curved"></i> Crepas Gourmet</span>
-              <h2 class="h2">Masa dorada.<br /><span class="text-pink">Corazón de Nutella.</span></h2>
-              <p class="lead">
-                Cada crepa se hornea al momento en plancha con mantequilla, hasta lograr ese borde ligeramente crujiente
-                y centro suave. La doblamos en abanico y la coronamos con crema batida y fresas del día.
-              </p>
-              <ul class="facts">
-                <li><b>100%</b><span>Hecha al momento</span></li>
-                <li><b>Fresa</b><span>Fruta fresca diaria</span></li>
-                <li><b>$85</b><span>Desde, MXN</span></li>
-              </ul>
-            </article>
-          </div>
-
-          <div class="panel-slot slot-right">
-            <article class="panel panel-b">
-              <span class="chip chip-green"><i class="fa-solid fa-magnifying-glass-plus"></i> Textura y detalle</span>
-              <h2 class="h2">Hilos de chocolate,<br /><span class="text-green">fresas que brillan.</span></h2>
-              <p class="lead">
-                Acércate: el glaseado cae en hilos finos sobre la masa, las fresas se rebanan al último segundo
-                y cada plato se sirve con el cuidado de un postre de autor. Se ve increíble, y sabe todavía mejor.
-              </p>
-              <ul class="facts">
-                <li><b>Menta</b><span>Fresca, siempre</span></li>
-                <li><b>Azúcar</b><span>Glass al final</span></li>
-                <li><b>360°</b><span>Míralo en 3D</span></li>
-              </ul>
-            </article>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- ============ 3. SELECTOR DE PRODUCTOS (la cámara retrocede) ============ -->
-      <section id="selector" class="pick">
-        <div class="sticky-wrap pick-wrap">
-          <div class="pick-side">
-            <div class="pick-head">
-              <span class="chip chip-amber"><i class="fa-solid fa-cube"></i> Menú 3D</span>
-              <h2 class="h2">Elige tu <span class="text-amber">antojo</span></h2>
-              <p class="lead lead-sm">Toca un producto y míralo girar en el escenario.</p>
-            </div>
-
-            <!-- Tarjetas generadas desde app.js (PRODUCTS) -->
-            <ul class="pick-cards" id="pick-cards" role="list"></ul>
-
-            <div class="pick-detail" id="pick-detail" aria-live="polite">
-              <p id="pick-desc"></p>
-              <button class="btn btn-green" id="pick-order" type="button">
-                <i class="fa-brands fa-whatsapp"></i><span id="pick-order-text">Pedir</span>
-              </button>
-            </div>
+          <div class="hero-actions" id="hero-actions">
+            <a class="btn btn-yellow" href="#menu">Ver el menú <i class="fa-solid fa-arrow-down" aria-hidden="true"></i></a>
+            <a class="btn btn-wa" href="#" data-wa="¡Hola Yukis Kikis! Quiero hacer un pedido 🧇"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Pedir por WhatsApp</a>
           </div>
         </div>
-      </section>
 
-    </div><!-- /#story -->
+        <div class="scroll-hint" id="scroll-hint" aria-hidden="true">
+          <span class="mouse"><i></i></span>
+          <span>Desliza para girar la crepa</span>
+        </div>
+        <span class="video-loading" id="video-loading" aria-live="polite"><i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i> Cargando video…</span>
+        <div class="hero-meter" aria-hidden="true"><i id="hero-meter-fill"></i></div>
+      </div>
+    </section>
 
-    <!-- ==========================================================
-         2. ESTUDIO 3D INTERACTIVO (visor principal)
-         ========================================================== -->
-    <section id="estudio-3d" class="section section-studio">
-      <div class="container">
-        <header class="section-head reveal">
-          <span class="chip chip-pink"><i class="fa-solid fa-cube"></i> Estudio 3D interactivo</span>
-          <h2 class="h2">Míralo desde todos los ángulos</h2>
-          <p class="lead">Arrastra para girar 360°, haz clic y usa la rueda (o los botones) para acercarte y cambia de producto con un toque.</p>
+    <!-- ============ MENÚ ============ -->
+    <section class="section" id="menu">
+      <div class="wrap">
+        <header class="section-head" data-reveal>
+          <span class="pill pill-blue">Nuestro menú</span>
+          <h2>Antojos que sí se ven <span class="u-red">así de ricos</span></h2>
+          <p>Elige tu favorito y arma el tuyo con los toppings que quieras. Cada ingrediente extra cuesta solo $10.</p>
+        </header>
+        <div class="gallery" id="menu-grid"></div>
+
+        <!-- Anuncios: los pósters completos, con platillos ya hechos -->
+        <div class="promos" id="promos">
+          <header class="section-head promos-head" data-reveal>
+            <span class="pill pill-red">Ya listos para pedir</span>
+            <h2>Nuestros <span class="u-blue">favoritos</span></h2>
+            <p>Platillos armados por nosotros. Agrégalos tal cual o edítalos a tu gusto.</p>
+          </header>
+          <div class="promo-grid" id="promo-grid"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PERSONALIZADOR "ARMA TU ANTOJO KIKIS" ============ -->
+    <section class="section section-blue" id="personaliza">
+      <div class="wrap">
+        <header class="section-head section-head-light" data-reveal>
+          <span class="pill pill-yellow">Paso a paso</span>
+          <h2>Arma tu Antojo <span class="hl-yellow">Kikis</span></h2>
+          <p>Elige qué se te antoja, el tamaño y tus toppings. El precio se actualiza solito.</p>
         </header>
 
-        <div class="studio reveal">
-          <div class="studio-top">
-            <div class="studio-tabs" id="studio-tabs" role="tablist" aria-label="Productos en 3D">
-              <button class="tab is-active" type="button" role="tab" aria-selected="true" data-product="crepa"><span>🥞</span>Crepa</button>
-              <button class="tab" type="button" role="tab" aria-selected="false" data-product="waffle"><span>🧇</span>Waffle</button>
-              <button class="tab" type="button" role="tab" aria-selected="false" data-product="fresas"><span>🍓</span>Fresas con Crema</button>
-              <button class="tab" type="button" role="tab" aria-selected="false" data-product="yuki"><span>🍧</span>Yuki Limón</button>
+        <div class="builder" id="builder" data-reveal>
+          <p class="b-editing" id="b-editing" hidden>✏️ Estás editando un artículo de tu pedido</p>
+          <ol class="b-dots" id="b-dots" aria-label="Progreso del personalizador"></ol>
+          <div class="b-panel" id="b-panel" aria-live="polite"></div>
+
+          <div class="b-pricebar" id="b-pricebar">
+            <div>
+              <span class="b-price-label" id="b-price-label">Tu antojo</span>
+              <small id="b-price-hint"></small>
             </div>
-            <div class="studio-tools">
-              <button class="tool" id="btn-zoom-in" type="button" aria-label="Acercar" title="Acercar"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
-              <button class="tool" id="btn-zoom-out" type="button" aria-label="Alejar" title="Alejar"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
-              <button class="tool is-on" id="btn-rotate" type="button" aria-pressed="true" aria-label="Rotación automática" title="Rotación automática"><i class="fa-solid fa-rotate"></i></button>
-              <button class="tool" id="btn-reset" type="button" aria-label="Restablecer vista" title="Restablecer vista"><i class="fa-solid fa-expand"></i></button>
-            </div>
+            <strong class="b-price" id="b-price">$0</strong>
           </div>
 
-          <div class="viewer" id="studio-viewer">
-            <div class="viewer-loading" id="studio-loading" role="status" aria-live="polite">
-              <div class="spinner" aria-hidden="true"></div>
-              <p id="studio-loading-text">Cargando modelo 3D…</p>
-              <div class="bar"><i id="studio-progress"></i></div>
-            </div>
-
-            <img class="viewer-fallback" id="studio-fallback" alt="" hidden />
-
-            <div class="viewer-hint" id="studio-hint">
-              <i class="fa-solid fa-hand-pointer"></i>
-              <span>Arrastra para girar · Clic y rueda para zoom</span>
-            </div>
-
-            <button class="viewer-lock" id="btn-lock" type="button" hidden>
-              <i class="fa-solid fa-hand-pointer"></i><span>Activar giro 360°</span>
-            </button>
-          </div>
-
-          <div class="studio-info">
-            <div class="studio-info-text">
-              <div class="studio-info-row">
-                <h3 id="studio-title">Crepa París Nutella &amp; Fresas</h3>
-                <span class="price-tag" id="studio-price">$85 MXN</span>
-              </div>
-              <p id="studio-desc">Crepa delgadita y dorada a la mantequilla, abundante Nutella original, fresas de huerto y azúcar glass.</p>
-            </div>
-            <button class="btn btn-green" id="studio-order" type="button">
-              <i class="fa-brands fa-whatsapp"></i><span id="studio-order-text">Pedir Crepa por WhatsApp</span>
-            </button>
+          <div class="b-nav">
+            <button type="button" class="btn btn-ghost-dark" id="step-prev" hidden><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Atrás</button>
+            <button type="button" class="btn btn-yellow" id="step-next">Siguiente <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+            <button type="button" class="btn btn-yellow" id="builder-add" hidden><i class="fa-solid fa-cart-plus" aria-hidden="true"></i> <span>Agregar y seguir pidiendo</span></button>
+            <button type="button" class="btn btn-wa" id="builder-review" hidden><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i> <span>Agregar y revisar pedido</span></button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ==========================================================
-         3. GALERÍA FOTOGRÁFICA REAL
-         ========================================================== -->
-    <section id="galeria" class="section section-alt">
-      <div class="container">
-        <header class="section-head reveal">
-          <span class="chip chip-green"><i class="fa-solid fa-camera"></i> Galería fotográfica real</span>
-          <h2 class="h2">Nuestros postres de verdad</h2>
-          <p class="lead">Fotos auténticas de lo que servimos cada día. Pídelos directo o rótalos en el estudio 3D.</p>
-        </header>
-
-        <div class="grid-3">
-          <article class="card gcard reveal" style="--accent:#FF2A6D">
-            <div class="gcard-media">
-              <img src="./crepa.png" alt="Crepa gourmet con Nutella y fresas" loading="lazy" decoding="async" />
-              <span class="badge badge-pink">🥞 Crepa Gourmet</span>
-              <span class="price-float">$85 <small>MXN</small></span>
-            </div>
-            <div class="gcard-body">
-              <h3>Crepa Francesa con Nutella &amp; Fresas</h3>
-              <p>Masa ligera y doradita a la plancha con mantequilla, doblada en abanico y cubierta con hilos de chocolate, rodajas de fresa fresca y azúcar glass.</p>
-              <div class="gcard-actions">
-                <button class="btn btn-ghost btn-sm" type="button" data-view3d="crepa"><i class="fa-solid fa-cube"></i><span>Ver y Rotar en 3D</span></button>
-                <button class="btn btn-green btn-sm" type="button" data-order="Crepa París Nutella & Fresas" data-price="85"><i class="fa-brands fa-whatsapp"></i><span>Pedir</span></button>
-              </div>
-            </div>
-          </article>
-
-          <article class="card gcard reveal" style="--accent:#FFB300">
-            <div class="gcard-media">
-              <img src="./wafle.png" alt="Waffle belga con fresas y arándanos" loading="lazy" decoding="async" />
-              <span class="badge badge-amber">🧇 Waffle Belga</span>
-              <span class="price-float">$95 <small>MXN</small></span>
-            </div>
-            <div class="gcard-body">
-              <h3>Waffle Belga con Miel &amp; Frutos</h3>
-              <p>Waffle redondo de cuadrícula profunda horneado al momento. Cada celda guarda sirope dorado brillante, fresas en abanico y arándanos frescos.</p>
-              <div class="gcard-actions">
-                <button class="btn btn-ghost btn-sm" type="button" data-view3d="waffle"><i class="fa-solid fa-cube"></i><span>Ver y Rotar en 3D</span></button>
-                <button class="btn btn-green btn-sm" type="button" data-order="Waffle Belga Supremo con Miel & Frutos" data-price="95"><i class="fa-brands fa-whatsapp"></i><span>Pedir</span></button>
-              </div>
-            </div>
-          </article>
-
-          <article class="card gcard reveal" style="--accent:#FF2A6D">
-            <div class="gcard-media">
-              <img src="./fresas con crema.png" alt="Vaso de fresas con crema" loading="lazy" decoding="async" />
-              <span class="badge badge-pink">🍓 Fresas con Crema</span>
-              <span class="price-float">$85 <small>MXN</small></span>
-            </div>
-            <div class="gcard-body">
-              <h3>Fresas con Crema Tres Leches Kikis</h3>
-              <p>Vaso transparente con abundantes capas visibles de crema artesanal, fresas rebanadas del día desbordando la cima y cucharita de madera.</p>
-              <div class="gcard-actions">
-                <button class="btn btn-ghost btn-sm" type="button" data-view3d="fresas"><i class="fa-solid fa-cube"></i><span>Ver y Rotar en 3D</span></button>
-                <button class="btn btn-green btn-sm" type="button" data-order="Fresas con Crema Yukis Kikis" data-price="85"><i class="fa-brands fa-whatsapp"></i><span>Pedir</span></button>
-              </div>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==========================================================
-         4. TARJETAS DE BENEFICIOS
-         ========================================================== -->
-    <section id="beneficios" class="section section-tight" aria-label="Beneficios">
-      <div class="container">
-        <div class="grid-4">
-          <article class="card benefit reveal">
-            <span class="benefit-ico ico-pink"><i class="fa-solid fa-apple-whole"></i></span>
-            <div><h3>Fruta Fresca Diaria</h3><p>Fresas maduras, mangos jugosos y kiwis frescos seleccionados cada mañana.</p></div>
-          </article>
-          <article class="card benefit reveal">
-            <span class="benefit-ico ico-green"><i class="fa-regular fa-snowflake"></i></span>
-            <div><h3>Nieve Ultra-Fina</h3><p>Nuestra textura de hielo absorbe por completo el jarabe frutal sin aguarse.</p></div>
-          </article>
-          <article class="card benefit reveal">
-            <span class="benefit-ico ico-amber"><i class="fa-solid fa-stroopwafel"></i></span>
-            <div><h3>Wafles &amp; Crepas</h3><p>Masa artesanal belga y francesa preparada al momento con mantequilla de calidad.</p></div>
-          </article>
-          <article class="card benefit reveal">
-            <span class="benefit-ico ico-green"><i class="fa-solid fa-motorcycle"></i></span>
-            <div><h3>Envío a Domicilio</h3><p>Empaque térmico que conserva tus yukis congelados y tus wafles calientitos.</p></div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==========================================================
-         5. MENÚ COMPLETO
-         ========================================================== -->
-    <section id="menu" class="section section-alt">
-      <div class="container">
-        <header class="section-head reveal">
-          <span class="chip chip-pink"><i class="fa-solid fa-utensils"></i> Carta de postres &amp; yukis</span>
-          <h2 class="h2">Menú completo de Yukis Kikis</h2>
-          <p class="lead">Filtra por categoría y toca <b class="t-green"><i class="fa-solid fa-cube"></i> 3D</b> para examinar el producto en el estudio.</p>
-        </header>
-
-        <div class="filters reveal" id="menu-filters" role="tablist" aria-label="Categorías del menú">
-          <button class="pill is-active" type="button" data-category="all"><span>🌟</span>Todo el Menú</button>
-          <button class="pill" type="button" data-category="yukis"><span>🍧</span>Yukis &amp; Nieve</button>
-          <button class="pill" type="button" data-category="crepas"><span>🥞</span>Crepas Gourmet</button>
-          <button class="pill" type="button" data-category="wafles"><span>🧇</span>Wafles Belgas</button>
-          <button class="pill" type="button" data-category="fresas"><span>🍓</span>Fresas con Crema</button>
-          <button class="pill" type="button" data-category="bebidas"><span>☕</span>Bebidas &amp; Malteadas</button>
-        </div>
-
-        <p class="menu-count" id="menu-count" aria-live="polite"></p>
-        <div class="grid-menu" id="menu-grid"></div>
-      </div>
-    </section>
-
-    <!-- ==========================================================
-         6. CONSTRUCTOR "ARMA TU ANTOJO KIKIS"
-         ========================================================== -->
-    <section id="arma-antojo" class="section">
-      <div class="container container-narrow">
-        <header class="section-head reveal">
-          <span class="chip chip-green"><i class="fa-solid fa-wand-magic-sparkles"></i> ¡A tu manera!</span>
-          <h2 class="h2">Arma tu Antojo Kikis</h2>
-          <p class="lead">Combina tu base preferida, tus untables y tus frutas. Te lo preparamos al instante.</p>
-        </header>
-
-        <div class="card builder reveal" id="builder">
-          <ol class="stepper" id="stepper" aria-label="Progreso del personalizador">
-            <li class="is-current" data-step-dot="1"><span>1</span><em>Base</em></li>
-            <li data-step-dot="2"><span>2</span><em>Untable</em></li>
-            <li data-step-dot="3"><span>3</span><em>Toppings</em></li>
-            <li data-step-dot="4"><span><i class="fa-solid fa-check"></i></span><em>Pedir</em></li>
-          </ol>
-
-          <form id="builder-form" novalidate>
-            <fieldset class="b-step is-active" data-step="1">
-              <legend><b>1</b>Elige tu Base</legend>
-              <div class="opts opts-2" id="opts-base"></div>
-            </fieldset>
-
-            <fieldset class="b-step" data-step="2">
-              <legend><b>2</b>Elige tu Untable o Salsa</legend>
-              <div class="opts opts-4" id="opts-sauce"></div>
-            </fieldset>
-
-            <fieldset class="b-step" data-step="3">
-              <legend><b>3</b>Toppings &amp; Frutas Naturales <small>(los que quieras)</small></legend>
-              <div class="opts opts-3" id="opts-topping"></div>
-            </fieldset>
-
-            <div class="b-step" data-step="4">
-              <p class="b-title"><b><i class="fa-solid fa-check"></i></b>Tu antojo está listo</p>
-              <label class="notes">
-                <span>Notas para el pedido <small>(opcional)</small></span>
-                <input type="text" id="builder-notes" maxlength="140" placeholder="Ej. sin nuez, poquito chocolate…" autocomplete="off" />
-              </label>
-            </div>
-
-            <div class="b-summary" aria-live="polite">
-              <span class="b-summary-label">Tu combinación</span>
-              <p id="builder-summary"></p>
-            </div>
-
-            <div class="b-nav">
-              <button type="button" class="btn btn-ghost" id="step-prev"><i class="fa-solid fa-arrow-left"></i><span>Atrás</span></button>
-              <button type="button" class="btn btn-pink" id="step-next"><span>Siguiente</span><i class="fa-solid fa-arrow-right"></i></button>
-              <a class="btn btn-green btn-wa" id="builder-wa" href="#" target="_blank" rel="noopener" hidden>
-                <i class="fa-brands fa-whatsapp"></i><span>Pedir Mi Antojo Kikis por WhatsApp</span>
-              </a>
-            </div>
-          </form>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==========================================================
-         7. NUESTRA PASIÓN
-         ========================================================== -->
-    <section id="historia" class="section section-alt">
-      <div class="container">
-        <div class="split">
-          <div class="split-logo reveal">
-            <div class="logo-ring"><img src="./logo.png" alt="Logotipo oficial de Yukis Kikis" loading="lazy" /></div>
+    <!-- ============ NUESTRA MARCA ============ -->
+    <section class="section" id="marca">
+      <div class="wrap brand-grid">
+        <figure class="mural" data-reveal>
+          <img id="mural-img" src="./image_f494dc.jpg" alt="Crepas y waffles hechos al momento en Yukis Kikis, Monterrey" loading="lazy" decoding="async" />
+          <div class="mural-missing" aria-hidden="true">
+            <img src="./logo-2.jpeg" onerror="this.onerror=null;this.src='./logo.png'" alt="" />
           </div>
+          <span class="sticker sticker-mural" aria-hidden="true">Hechos<br />al momento</span>
+        </figure>
 
-          <div class="split-copy reveal">
-            <span class="chip chip-pink">🍉 Sabor juvenil, fresco y natural</span>
-            <h2 class="h2">Nuestra Pasión:<br /><span class="grad-text">Fruta Real en Cada Bocado.</span></h2>
-            <p class="lead">
-              En <strong>Yukis Kikis</strong> creemos que los mejores postres no necesitan jarabes artificiales.
-              Por eso nuestros yukis se preparan con <strong>fruta fresca macerada diariamente</strong>: limones con un toque
-              de kiwi, pulpa jugosa de mango Manila y fresas maduras.
-            </p>
-            <p class="lead">
-              Nuestras <strong>crepas</strong>, <strong>wafles</strong> y <strong>fresas con crema</strong> se preparan al momento
-              con ingredientes seleccionados, mantequilla de calidad y nuestra receta artesanal de crema dulce.
-            </p>
+        <div class="brand-copy" data-reveal>
+          <span class="pill pill-red">Nuestra Marca</span>
+          <h2>Antojos Felices <span class="u-blue">Desde Siempre</span></h2>
+          <p>En Yukis Kikis nacimos en Monterrey con una idea muy sencilla: que un postre te cambie el día. Cada crepa, waffle y Yuki se prepara al momento, con fruta fresca que llega diario y nieve ultra fina hecha con cariño.</p>
+          <p>Crepas y waffles hechos al momento, con colores, fruta y alegría en cada visita.</p>
+          <ul class="checks">
+            <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Fruta fresca todos los días</li>
+            <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Nieve ultra fina</li>
+            <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Waffles y crepas hechos al momento</li>
+            <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Envío a domicilio en Monterrey</li>
+          </ul>
+        </div>
+      </div>
+    </section>
 
-            <ul class="checks">
-              <li><i class="fa-solid fa-check"></i>100% pulpa natural</li>
-              <li><i class="fa-solid fa-check"></i>Mantequilla de calidad</li>
-              <li><i class="fa-solid fa-check"></i>Empaque térmico pro</li>
-              <li><i class="fa-solid fa-check"></i>Atención rápida y alegre</li>
+    <!-- ============ HORARIO & ESTADO EN VIVO ============ -->
+    <section class="section section-sky" id="horario">
+      <div class="wrap">
+        <div class="hours-card" data-reveal>
+          <div class="hours-live">
+            <span class="live-pill" id="live-pill" data-state="loading">
+              <i class="live-dot" aria-hidden="true"></i>
+              <span id="live-text">Revisando horario…</span>
+            </span>
+            <p class="live-sub" id="live-sub">Hora de Monterrey, N.L.</p>
+          </div>
+          <div class="hours-info">
+            <h2>Horario de atención</h2>
+            <ul class="hours-list" id="hours-list">
+              <li data-day="1"><span>Lunes</span><b class="closed">Cerrado</b></li>
+              <li data-day="2"><span>Martes</span><b>3:00 PM – 10:30 PM</b></li>
+              <li data-day="3"><span>Miércoles</span><b>3:00 PM – 10:30 PM</b></li>
+              <li data-day="4"><span>Jueves</span><b>3:00 PM – 10:30 PM</b></li>
+              <li data-day="5"><span>Viernes</span><b>3:00 PM – 10:30 PM</b></li>
+              <li data-day="6"><span>Sábado</span><b>3:00 PM – 10:30 PM</b></li>
+              <li data-day="0"><span>Domingo</span><b>3:00 PM – 10:30 PM</b></li>
             </ul>
-
-            <a href="#contacto" class="link-arrow">Conoce nuestra ubicación y zona de delivery <i class="fa-solid fa-arrow-right"></i></a>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ==========================================================
-         8. PEDIDOS & VISITAS · HORARIOS Y UBICACIÓN
-         ========================================================== -->
-    <section id="contacto" class="section">
-      <div class="container">
-        <div class="contact-grid">
+    <!-- ============ UBICACIÓN & DELIVERY ============ -->
+    <section class="section section-pink" id="ubicacion">
+      <div class="wrap loc-grid">
+        <div class="loc-copy" data-reveal>
+          <span class="pill pill-red">Ubicación & Delivery</span>
+          <h2>Te lo llevamos o <span class="u-blue">pasa por él</span></h2>
+          <p>Estamos en Monterrey, Nuevo León. Escríbenos por WhatsApp para confirmar tu zona y tiempo de entrega.</p>
 
-          <div class="contact-copy reveal">
-            <span class="chip chip-green">Pedidos &amp; Visitas</span>
-            <h2 class="h2">¿Listo para tu Yuki Kikis?</h2>
-            <p class="lead">Visítanos para disfrutar tus postres o pide a domicilio por WhatsApp con respuesta inmediata.</p>
+          <ul class="zones">
+            <li class="zone">
+              <span class="zone-price">$25<small>MXN</small></span>
+              <div><b>Zona 1</b><span>Colonias cercanas a la sucursal</span></div>
+            </li>
+            <li class="zone">
+              <span class="zone-price">$35<small>MXN</small></span>
+              <div><b>Zona 2</b><span>Colonias más alejadas</span></div>
+            </li>
+            <li class="zone zone-free">
+              <span class="zone-price">GRATIS</span>
+              <div><b>Pick-up</b><span>Pasa a recoger tu pedido</span></div>
+            </li>
+          </ul>
 
-            <ul class="info-list">
-              <li>
-                <span class="info-ico ico-amber"><i class="fa-regular fa-clock"></i></span>
-                <div><h4>Horario de Servicio</h4><p>Martes a Domingo: <b>3:00 PM – 10:30 PM</b></p><small>Lunes cerramos por descanso</small></div>
-              </li>
-              <li>
-                <span class="info-ico ico-pink"><i class="fa-solid fa-location-dot"></i></span>
-                <div><h4>Ubicación del Local</h4><p>Monterrey, Nuevo León</p><small>Agrega aquí la dirección exacta del local</small></div>
-              </li>
-              <li>
-                <span class="info-ico ico-green"><i class="fa-brands fa-whatsapp"></i></span>
-                <div><h4>WhatsApp de Pedidos</h4><p id="wa-display">+52 (81) 1234-5678</p><small>Toma de pedidos en tiempo real</small></div>
-              </li>
-            </ul>
+          <a class="btn btn-wa btn-lg" href="#" data-wa="¡Hola Yukis Kikis! Quiero pedir a domicilio. Mi colonia es: ">
+            <i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Escríbenos por WhatsApp
+          </a>
+        </div>
 
-            <div class="contact-actions">
-              <button class="btn btn-green" type="button" data-wa="Quiero información sobre pedidos y servicio a domicilio."><i class="fa-brands fa-whatsapp"></i><span>Abrir WhatsApp Directo</span></button>
-              <a class="btn btn-ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Monterrey%2C+Nuevo+Le%C3%B3n" target="_blank" rel="noopener"><i class="fa-solid fa-map-location-dot"></i><span>Cómo llegar</span></a>
-            </div>
-          </div>
-
-          <div class="contact-side">
-          <div class="card delivery reveal">
-            <div class="delivery-top">
-              <span class="badge badge-green">🛵 Zona de entrega rápida</span>
-              <small>Garantía de frescura</small>
-            </div>
-            <h3>Reparto a domicilio con empaque térmico especial</h3>
-            <p>Cuidamos cada detalle para que tus yukis lleguen con su nieve intacta y tus crepas y wafles crujientes y tibios.</p>
-
-            <div class="zones">
-              <div class="zone"><b>Zona 1 (0–3 km)</b><span class="t-green">Envío $25 MXN</span></div>
-              <div class="zone"><b>Zona 2 (3–6 km)</b><span class="t-green">Envío $35 MXN</span></div>
-              <div class="zone zone-wide"><b>Pick-up en Local</b><span class="t-pink">¡Gratis!</span></div>
-            </div>
-
-            <div class="delivery-foot">
-              <span>💳 Aceptamos efectivo, transferencias y tarjetas</span>
-              <span class="t-amber">¡Pide tu antojo favorito!</span>
-            </div>
-          </div>
-
-          <div class="map-frame reveal">
-            <iframe
-              title="Mapa de Monterrey, Nuevo León"
-              src="https://www.google.com/maps?q=Monterrey,+Nuevo+Le%C3%B3n&amp;output=embed"
-              loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
-          </div>
-          </div>
-
+        <div class="map-frame" data-reveal>
+          <iframe title="Mapa de Monterrey, Nuevo León"
+                  src="https://www.google.com/maps?q=Monterrey,+Nuevo+Le%C3%B3n,+M%C3%A9xico&output=embed"
+                  loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+          <span class="sticker sticker-map" aria-hidden="true"><i class="fa-solid fa-location-dot"></i> Monterrey</span>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- ==========================================================
-       9. FOOTER COMPLETO
-       ========================================================== -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-grid">
-
-        <div class="footer-brand">
-          <a href="#hero" class="nav-brand">
-            <span class="nav-logo"><img src="./logo.png" alt="Logo Yukis Kikis" /></span>
-            <span class="nav-name">Yukis <b>Kikis</b></span>
-          </a>
-          <p>Negocio local de Monterrey dedicado a los yukis de nieve artesanal, crepas francesas, wafles belgas y fresas con crema. Fruta fresca de temporada y amor en cada preparación.</p>
-          <div class="socials" aria-label="Redes sociales">
-            <!-- Reemplaza los # por los enlaces reales -->
-            <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-            <a href="#" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
-            <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-            <a href="#" data-wa="Quiero más información." aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
-          </div>
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer" id="footer">
+    <div class="wrap footer-grid">
+      <div class="footer-brand">
+        <a class="brand brand-light" href="#inicio" aria-label="Yukis Kikis">
+          <img src="./logo-2.jpeg" onerror="this.onerror=null;this.src='./logo.png'" alt="" width="56" height="56" />
+          <span class="brand-name">Yukis<b>Kikis</b></span>
+        </a>
+        <p>Crepas, waffles, fresas con crema y Yukis. Hechos con fruta fresca en Monterrey, N.L.</p>
+        <img class="footer-sign" src="./image_f4993f.png" onerror="this.style.display='none'" alt="Letrero circular de Yukis Kikis" width="120" height="120" loading="lazy" />
+        <div class="socials" aria-label="Redes sociales">
+          <a href="#" data-social="instagram" aria-label="Instagram" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" data-social="facebook" aria-label="Facebook" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="#" data-social="tiktok" aria-label="TikTok" target="_blank" rel="noopener"><i class="fa-brands fa-tiktok"></i></a>
+          <a href="#" data-wa="Hola Yukis Kikis" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
         </div>
-
-        <div>
-          <h4>Enlaces directos</h4>
-          <ul class="footer-links">
-            <li><a href="#estudio-3d" data-view3d="yuki">🍧 Yuki Limón en 3D</a></li>
-            <li><a href="#estudio-3d" data-view3d="crepa">🥞 Crepa Gourmet en 3D</a></li>
-            <li><a href="#estudio-3d" data-view3d="waffle">🧇 Waffle Belga en 3D</a></li>
-            <li><a href="#estudio-3d" data-view3d="fresas">🍓 Fresas con Crema en 3D</a></li>
-            <li><a href="#menu">📋 Menú completo</a></li>
-            <li><a href="#arma-antojo">✨ Arma tu antojo</a></li>
-          </ul>
-        </div>
-
-        <div>
-          <h4>Horario</h4>
-          <p class="footer-hours">Martes a Domingo: 3:00 PM – 10:30 PM<br />Lunes: Cerrado por descanso</p>
-          <span class="status" id="live-status" data-state="open"><i class="ping"></i><span id="live-status-text">Abiertos y recibiendo órdenes</span></span>
-        </div>
-
       </div>
 
-      <div class="footer-bottom">
-        <p>&copy; <span id="year">2026</span> Yukis Kikis · Monterrey, N.L. Todos los derechos reservados.</p>
-        <p>Hecho con <i class="fa-solid fa-heart t-pink"></i> y fruta fresca de temporada 🥝🍓🥭</p>
+      <nav class="footer-links" aria-label="Accesos rápidos">
+        <h3>Accesos rápidos</h3>
+        <a href="#inicio">Inicio</a>
+        <a href="#menu">Menú</a>
+        <a href="#personaliza">Arma tu Antojo</a>
+        <a href="#marca">Nuestra Marca</a>
+        <a href="#horario">Horario</a>
+        <a href="#ubicacion">Ubicación y Delivery</a>
+      </nav>
+
+      <div class="footer-status">
+        <h3>Hoy</h3>
+        <span class="live-pill live-pill-dark" id="footer-live" data-state="loading"><i class="live-dot" aria-hidden="true"></i><span id="footer-live-text">Revisando horario…</span></span>
+        <p>Martes a Domingo<br />3:00 PM – 10:30 PM</p>
       </div>
+    </div>
+    <div class="wrap footer-bottom">
+      <p>© <span id="year">2026</span> Yukis Kikis · Monterrey, N.L. Todos los derechos reservados.</p>
     </div>
   </footer>
 
-  <!-- Botón flotante de WhatsApp + toast -->
-  <button class="wa-float" type="button" data-wa="Me gustaría ver el menú completo de hoy o pedir informes sobre el servicio a domicilio." aria-label="Pedir por WhatsApp">
-    <i class="fa-brands fa-whatsapp"></i><span class="wa-dot"></span>
-  </button>
+  <!-- ============ CARRITO (modal lateral) ============ -->
+  <div class="cart-overlay" id="cart-overlay" data-cart-close></div>
+  <aside class="cart-modal" id="cart-modal" role="dialog" aria-modal="true" aria-labelledby="cart-title" aria-hidden="true">
+    <header class="cart-head">
+      <h2 id="cart-title">🛒 Tu pedido</h2>
+      <button type="button" class="cart-close" data-cart-close aria-label="Cerrar carrito">✕</button>
+    </header>
+
+    <div class="cart-body">
+      <ul class="cart-list" id="cart-list"></ul>
+      <p class="cart-empty" id="cart-empty">Tu carrito está vacío. ¡Agrega algo rico del menú! 🧇</p>
+    </div>
+
+    <footer class="cart-foot" id="cart-foot">
+      <fieldset class="cart-delivery">
+        <legend>¿Cómo lo quieres?</legend>
+        <label><input type="radio" name="delivery" value="pickup" checked /> <span>Pick-up <b>Gratis</b></span></label>
+        <label><input type="radio" name="delivery" value="z1" /> <span>Zona 1 <b>$25</b></span></label>
+        <label><input type="radio" name="delivery" value="z2" /> <span>Zona 2 <b>$35</b></span></label>
+      </fieldset>
+      <dl class="cart-totals">
+        <div><dt>Subtotal</dt><dd id="cart-subtotal">$0</dd></div>
+        <div><dt>Envío</dt><dd id="cart-fee">$0</dd></div>
+        <div class="cart-total"><dt>Total</dt><dd id="cart-total">$0</dd></div>
+      </dl>
+      <label class="cart-notes">
+        <span>Notas para tu pedido <small>(opcional)</small></span>
+        <textarea id="cart-notes" rows="2" maxlength="200" placeholder="Ej. sin nuez, entregar en la caseta…"></textarea>
+      </label>
+      <div class="cart-actions">
+        <button type="button" class="btn btn-wa btn-block" id="cart-wa"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Enviar pedido por WhatsApp</button>
+        <button type="button" class="btn btn-yellow btn-block" id="cart-more" data-add-more><i class="fa-solid fa-plus" aria-hidden="true"></i> Agregar otra cosa</button>
+        <button type="button" class="btn btn-ghost-dark btn-block" id="cart-clear">Vaciar carrito</button>
+      </div>
+    </footer>
+  </aside>
+
+  <!-- ============ MODAL: ¿AÑADIR ALGO MÁS ANTES DE ENVIAR? ============ -->
+  <div class="order-modal" id="ask-modal" role="dialog" aria-modal="true" aria-labelledby="ask-title" hidden>
+    <div class="order-backdrop" data-ask-close></div>
+    <div class="order-card">
+      <div class="order-emoji" aria-hidden="true">🤔</div>
+      <h2 id="ask-title">Antes de enviar tu pedido… <span>¿Deseas añadir otra cosa?</span></h2>
+      <p class="order-sub" id="ask-summary"></p>
+      <div class="order-actions">
+        <button type="button" class="btn btn-yellow" id="ask-more">Sí, añadir algo más</button>
+        <button type="button" class="btn btn-wa" id="ask-send"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> No, enviar mi pedido</button>
+        <button type="button" class="btn-link" id="ask-back">Volver a revisar mi pedido</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODAL POST-PEDIDO ============ -->
+  <div class="order-modal" id="order-modal" role="dialog" aria-modal="true" aria-labelledby="order-title" hidden>
+    <div class="order-backdrop" data-order-close></div>
+    <div class="order-card">
+      <div class="order-emoji" aria-hidden="true">🧇</div>
+      <h2 id="order-title">¡Tu pedido está en camino a nuestro WhatsApp! <span>¿Quieres seguir viendo el menú?</span></h2>
+      <div class="order-actions">
+        <button type="button" class="btn btn-yellow" id="order-more">Sí, seguir viendo</button>
+        <button type="button" class="btn btn-blue" id="order-reset">No, volver al inicio</button>
+      </div>
+    </div>
+  </div>
+
+  <a class="wa-float" href="#" data-wa="¡Hola Yukis Kikis! Quiero hacer un pedido 🧇" aria-label="Pedir por WhatsApp">
+    <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+  </a>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <noscript>
-    <p class="noscript">Esta página necesita JavaScript para mostrar el menú, el constructor y el estudio 3D.</p>
-  </noscript>
+  <!-- Lienzo para el modelo 3D futuro (oculto mientras FUTURE_3D.enabled = false en app.js) -->
+  <canvas id="webgl-3d" class="webgl-3d" aria-hidden="true" hidden></canvas>
 
-  <!-- Librerías (CDN estables): Three.js r128, OrbitControls, GLTFLoader, GSAP 3.12 y ScrollTrigger -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <noscript><p class="noscript">Activa JavaScript para ver el video interactivo y usar el carrito. También puedes escribirnos por WhatsApp.</p></noscript>
+
+  <!-- ===== Librerías (el orden importa) ===== -->
+  <!-- Three.js r128 + GLTFLoader + DRACOLoader: listos para modelos .glb comprimidos (apagado por ahora) -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
+  <!-- GSAP + ScrollTrigger -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-
   <script src="./app.js"></script>
 </body>
 </html>
