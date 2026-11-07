@@ -113,36 +113,36 @@
   /* Fotos: se prueba cada archivo en orden y se usa el primero que exista.
      crop = recorte con CSS (x e y = punto de enfoque en %, z = zoom) para usar solo el platillo del póster. */
   const POSTER = {
-    waffle: ['./POSTER WAFFLE_upscayl_4x_upscayl-standard-4x_2.jpg', './poster-waffle.jpg'],
-    fresas: ['./POSTER FRESAS_upscayl_4x_upscayl-standard-4x_2.jpg', './poster-fresas.jpg'],
-    mango: ['./MANGO_upscayl_4x_upscayl-standard-4x_2.jpg', './poster-mango.jpg']
+    crepa: ['./poster-crepa.jpg'],
+    waffle: ['./poster-waffle.jpg', './poster-waffle-2.jpg'],
+    fresas: ['./poster-fresas.jpg'],
+    mango: ['./poster-mango.jpg']
   };
-  const CROP = { x: 50, y: 55, z: 1.7 };
 
-  /* Tarjetas del MENÚ (foto recortada + ingredientes) */
+  /* Tarjetas del MENÚ (foto del platillo recortada + ingredientes) */
   const MENU = [
     {
       type: 'crepa', badge: 'Crepa Gourmet', emoji: '🥞',
       desc: 'Crepa francesa suave y delgada, hecha al momento y rellena de lo que más se te antoje.',
-      photos: [{ src: './crepa.png' }],
+      photos: [{ src: './menu-crepa.jpg' }, { src: './crepa.png' }],
       quick: { type: 'crepa', ingredients: ['nutella', 'fresas'] }
     },
     {
       type: 'waffle', badge: 'Waffle Belga', emoji: '🧇',
       desc: 'Dorado y crujiente por fuera, esponjoso por dentro. Pídelo con tus toppings favoritos.',
-      photos: [...POSTER.waffle.map((src) => ({ src, crop: CROP })), { src: './wafle.png' }],
+      photos: [{ src: './menu-waffle.jpg' }, { src: './wafle.png' }],
       quick: { type: 'waffle', ingredients: ['nutella', 'fresas'] }
     },
     {
       type: 'fresas', badge: 'Fresas con Crema', emoji: '🍓',
       desc: 'Fresas frescas del día con crema cremosita. Chicas o grandes, con los toppings que quieras.',
-      photos: [...POSTER.fresas.map((src) => ({ src, crop: CROP })), { src: './fresas con crema.png', fit: 'contain' }],
+      photos: [{ src: './menu-fresas.jpg' }, { src: './fresas con crema.png', fit: 'contain' }],
       quick: { type: 'fresas', size: 'chica', ingredients: ['lechera'] }
     },
     {
       type: 'yuki', badge: 'Yuki', emoji: '🍧',
       desc: 'Nieve ultra fina en vaso. Elige tamaño y sabores: un sabor por cucharón servido.',
-      photos: [{ src: './yuki limon.png', fit: 'contain' }],
+      photos: [{ src: './menu-yuki.jpg' }, { src: './yuki limon.png', fit: 'contain' }],
       quick: { type: 'yuki', size: 'chico', flavors: ['limon'] }
     }
   ];
@@ -150,8 +150,10 @@
   /* Platillos YA HECHOS (se muestran con el póster completo, sin recortar, como anuncios).
      Ajusta nombre y contenido para que coincidan con lo que dice cada póster. */
   const PROMOS = [
+    { id: 'promo-crepa', name: 'Crepa de Nutella con Fresas', emoji: '🥞', photos: POSTER.crepa.map((src) => ({ src })),
+      spec: { type: 'crepa', ingredients: ['nutella', 'fresas'] } },
     { id: 'promo-waffle', name: 'Waffle Belga Especial', emoji: '🧇', photos: POSTER.waffle.map((src) => ({ src })),
-      spec: { type: 'waffle', ingredients: ['nutella', 'fresas', 'kiwi'] } },
+      spec: { type: 'waffle', ingredients: ['nutella', 'fresas', 'lechera'] } },
     { id: 'promo-fresas', name: 'Fresas con Crema Especial', emoji: '🍓', photos: POSTER.fresas.map((src) => ({ src })),
       spec: { type: 'fresas', size: 'grande', ingredients: ['lechera', 'nuez'] } },
     { id: 'promo-mango', name: 'Yuki de Mango', emoji: '🥭', photos: POSTER.mango.map((src) => ({ src })),
