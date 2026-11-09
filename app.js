@@ -15,24 +15,27 @@
      ------------------------------------------------------------------------ */
   const CONFIG = {
     brand: 'Yukis Kikis',
-    whatsapp: '528112345678',            // ← pon aquí tu número real: 52 + 10 dígitos, sin +, espacios ni guiones
+    whatsapp: '528125815389',            // +52 812 581 5389
     timezone: 'America/Monterrey',
     openMinutes: 15 * 60,                // 3:00 PM
     closeMinutes: 22 * 60 + 30,          // 10:30 PM
     closedDay: 1,                        // 0 = Domingo … 1 = Lunes (día de descanso)
-    delivery: {                          // costo de envío en MXN
-      pickup: { label: 'Pick-up', fee: 0 },
-      z1: { label: 'Zona 1', fee: 25 },
-      z2: { label: 'Zona 2', fee: 35 }
-    },
-    social: {                            // ← reemplaza por tus enlaces reales
-      instagram: 'https://www.instagram.com/yukiskikis',
-      facebook: 'https://www.facebook.com/yukiskikis',
-      tiktok: 'https://www.tiktok.com/@yukiskikis'
+    maps: 'https://maps.app.goo.gl/zuhFiZuH5n8V4cHaA',
+    /* Para mostrar el MAPA con la dirección, llena UNA de estas dos:
+       address  → la dirección escrita, ej. 'Av. Ejemplo 123, Col. Centro, Monterrey, N.L.'
+       mapEmbed → el enlace del iframe de Google Maps (Compartir → Insertar un mapa → copia solo lo que va en src="...") */
+    coords: '',        // ← LO MÁS FÁCIL: coordenadas del pin, ej. '25.7500,-100.3900' (en Google Maps: clic derecho sobre el pin → clic en los números para copiarlos)
+    address: 'Av. de los Astros 1305, Barrio Santa Isabel, 64102 Monterrey, N.L.',
+    mapEmbed: '',
+    mapQuery: 'Yukis Kikis, Monterrey, Nuevo León',   // búsqueda que usa el mapa mientras no pongas address o mapEmbed
+    /* Envío a domicilio: por ahora NO se ofrece en el carrito; se cotiza y se cobra por separado. */
+    social: {
+      instagram: 'https://www.instagram.com/kikis.dk',
+      facebook: 'https://www.facebook.com/share/1CQ5jbjxVg/?mibextid=wwXIfr'
     },
     heroVideos: [                        // se alternan entre visitas; usa ?video=yuki o ?video=crepa para forzar uno
-      { key: 'crepa', src: './video_crepa_2.mp4', poster: './crepa_2.png' },
-      { key: 'yuki', src: './video_yuki.mp4', poster: '' }
+      { key: 'crepa', src: './video_crepa_nuevo.mp4', poster: '' },
+      { key: 'yuki', src: './video_yuki_mango.mp4', poster: '' }
     ],
     video: {
       scrub: 0.5,                        // suavizado de GSAP ScrollTrigger (0.5 – 1)
@@ -57,61 +60,92 @@
      ------------------------------------------------------------------------ */
   const EXTRA = 10;                      // cada ingrediente extra
 
-  /* Untables y toppings cuentan igual: todos son "toppings" / ingredientes */
-  const INGREDIENTS = [
+  /* Crepa dulce y waffle llevan los mismos toppings. Untables y toppings cuentan igual. */
+  const ING_SWEET = [
     { id: 'nutella', label: 'Nutella', icon: '🍫' },
-    { id: 'cajeta', label: 'Cajeta', icon: '🍯' },
-    { id: 'lechera', label: 'Lechera', icon: '🥛' },
-    { id: 'queso', label: 'Queso Crema', icon: '🧀' },
-    { id: 'fresas', label: 'Fresas', icon: '🍓' },
-    { id: 'kiwi', label: 'Kiwi', icon: '🥝' },
-    { id: 'mango', label: 'Mango', icon: '🥭' },
+    { id: 'philadelphia', label: 'Philadelphia', icon: '🧀' },
+    { id: 'fresa', label: 'Fresa', icon: '🍓' },
     { id: 'platano', label: 'Plátano', icon: '🍌' },
     { id: 'nuez', label: 'Nuez', icon: '🥜' },
-    { id: 'nieve', label: 'Bola de Nieve', icon: '🍨' }
+    { id: 'merm-fresa', label: 'Mermelada de fresa', icon: '🍓' },
+    { id: 'lechera', label: 'Lechera', icon: '🥛' },
+    { id: 'bombones', label: 'Bombones', icon: '☁️' },
+    { id: 'hersheys', label: 'Hersheys', icon: '🍫' },
+    { id: 'cajeta', label: 'Cajeta', icon: '🍯' },
+    { id: 'cacahuate', label: 'Crema de cacahuate', icon: '🥜' },
+    { id: 'merm-zarzamora', label: 'Mermelada de zarzamora', icon: '🫐' },
+    { id: 'chispas', label: 'Chispas de chocolate', icon: '🍫' },
+    { id: 'almendras', label: 'Almendras', icon: '🌰' },
+    { id: 'merm-frutos', label: 'Mermelada de frutos rojos', icon: '🍒' },
+    { id: 'cajeta-art', label: 'Cajeta artesanal', icon: '🍯' },
+    { id: 'batida', label: 'Crema batida', icon: '🍦' },
+    { id: 'oreo', label: 'Oreo', icon: '🍪' }
   ];
+  /* Crepa salada */
+  const ING_SALTY = [
+    { id: 'manchego', label: 'Queso Manchego', icon: '🧀', group: 'base', sub: 'Con manchego: $90' },
+    { id: 'jamon', label: 'Jamón', icon: '🥓', group: 'base' },
+    { id: 'philadelphia', label: 'Philadelphia', icon: '🧀', group: 'base' },
+    { id: 'chipotle', label: 'Aderezo Chipotle', icon: '🌶️', group: 'sauce', sub: 'Gratis · solo 1' },
+    { id: 'habanero', label: 'Aderezo Habanero', icon: '🔥', group: 'sauce', sub: 'Gratis · solo 1' },
+    { id: 'jalapeno', label: 'Aderezo Queso Jalapeño', icon: '🫑', group: 'sauce', sub: 'Gratis · solo 1' },
+    { id: 'peperoni', label: 'Peperoni', icon: '🍕', group: 'extra', sub: '+$15' },
+    { id: 'pina-salada', label: 'Piña', icon: '🍍', group: 'extra', sub: '+$15' },
+    { id: 'champinones', label: 'Champiñones', icon: '🍄', group: 'extra', sub: '+$15' }
+  ];
+  const SALTY_PRICE = { base: 80, withManchego: 90, extra: 15 };   // jamón + philadelphia $80 · con manchego $90 · extras +$15
+  const DIABLITO_EXTRA = 10;                                         // sabor extra junto a un Diablito
+  const INGREDIENTS = [...ING_SWEET, ...ING_SALTY.filter((s) => !ING_SWEET.some((d) => d.id === s.id))];
 
   /* Sabores del Yuki (un sabor por cucharón servido) */
   const FLAVORS = [
-    { id: 'limon', label: 'Limón', icon: '🍋' },
-    { id: 'fresa', label: 'Fresa', icon: '🍓' },
-    { id: 'mango', label: 'Mango', icon: '🥭' },
-    { id: 'pina', label: 'Piña', icon: '🍍' },
-    { id: 'uva', label: 'Uva', icon: '🍇' },
-    { id: 'tamarindo', label: 'Tamarindo', icon: '🌶️' },
-    { id: 'sandia', label: 'Sandía', icon: '🍉' },
     { id: 'coco', label: 'Coco', icon: '🥥' },
+    { id: 'guayaba', label: 'Guayaba', icon: '🍈' },
+    { id: 'pina', label: 'Piña', icon: '🍍' },
+    { id: 'mango', label: 'Mango', icon: '🥭' },
+    { id: 'cocada', label: 'Cocada', icon: '🥥' },
+    { id: 'tamarindo', label: 'Tamarindo', icon: '🌶️' },
+    { id: 'pina-colada', label: 'Piña Colada', icon: '🍹' },
+    { id: 'guanabana', label: 'Guanábana', icon: '🍈' },
+    { id: 'fresa', label: 'Fresa', icon: '🍓' },
+    { id: 'nuez', label: 'Nuez', icon: '🥜' },
     { id: 'kiwi', label: 'Kiwi', icon: '🥝' },
-    { id: 'cereza', label: 'Cereza', icon: '🍒' }
+    { id: 'maracuya', label: 'Maracuyá', icon: '🍊' },
+    { id: 'diablito', label: 'Diablito', icon: '😈', sub: 'Limón, chamoy y chile en polvo' },
+    { id: 'vainilla', label: 'Vainilla', icon: '🍦' },
+    { id: 'limon', label: 'Limón', icon: '🍋' },
+    { id: 'chicle', label: 'Chicle', icon: '🍬' },
+    { id: 'fresa-esencia', label: 'Fresa (Esencia)', icon: '🍓' },
+    { id: 'uva', label: 'Uva', icon: '🍇' }
   ];
 
   /* Tipos de antojo.
-     · kind 'ing'     → precio base incluye N ingredientes; cada extra suma EXTRA (waffle y crepa).
+     · kind 'ing'     → el precio base incluye N ingredientes; cada extra suma EXTRA (waffle y crepa).
      · kind 'sized'   → igual, pero el tamaño define base e ingredientes incluidos (fresas con crema).
      · kind 'flavors' → el tamaño define el precio y cuántos sabores caben (yuki). */
   const TYPES = {
-    waffle: { label: 'Waffle Belga', icon: '🧇', kind: 'ing', base: 80, included: 2, steps: ['type', 'ing', 'review'] },
-    crepa: { label: 'Crepa Francesa', icon: '🥞', kind: 'ing', base: 80, included: 2, steps: ['type', 'ing', 'review'] },
+    crepa: { label: 'Crepa', icon: '🥞', kind: 'ing', base: 80, included: 2, styles: true, steps: ['type', 'style', 'ing', 'review'] },
+    waffle: { label: 'Waffle de Chocolate', icon: '🧇', kind: 'ing', base: 80, included: 2, steps: ['type', 'ing', 'review'] },
     fresas: {
       label: 'Fresas con Crema', icon: '🍓', kind: 'sized', steps: ['type', 'size', 'ing', 'review'],
       sizes: [
         { id: 'chica', label: 'Chica', base: 80, included: 1 },
-        { id: 'grande', label: 'Grande', base: 100, included: 2 }
+        { id: 'grande', label: 'Grande', base: 100, included: 2 },
+        { id: 'jumbo', label: 'Jumbo', base: 130, included: 2 }     // vaso más grande
       ]
     },
     yuki: {
       label: 'Yuki', icon: '🍧', kind: 'flavors', steps: ['type', 'size', 'flavors', 'review'],
       sizes: [
-        { id: 'chico', label: 'Chico', price: 40, max: 2 },
-        { id: 'mediano', label: 'Mediano', price: 50, max: 3 },
+        { id: 'chica', label: 'Chica', price: 40, max: 2 },
+        { id: 'mediana', label: 'Mediana', price: 50, max: 3 },
         { id: 'grande', label: 'Grande', price: 90, max: 4 }
       ]
     }
   };
-  const STEP_LABELS = { type: 'Antojo', size: 'Tamaño', ing: 'Toppings', flavors: 'Sabores', review: 'Pedir' };
+  const STEP_LABELS = { type: 'Antojo', style: 'Tipo', size: 'Tamaño', ing: 'Toppings', flavors: 'Sabores', review: 'Pedir' };
 
-  /* Fotos: se prueba cada archivo en orden y se usa el primero que exista.
-     crop = recorte con CSS (x e y = punto de enfoque en %, z = zoom) para usar solo el platillo del póster. */
+  /* Fotos: se prueba cada archivo en orden y se usa el primero que exista. */
   const POSTER = {
     crepa: ['./poster-crepa.jpg'],
     waffle: ['./poster-waffle.jpg', './poster-waffle-2.jpg'],
@@ -119,45 +153,29 @@
     mango: ['./poster-mango.jpg']
   };
 
-  /* Tarjetas del MENÚ (foto del platillo recortada + ingredientes) */
+  /* Tarjetas del MENÚ. chips = lista que se muestra como toppings/sabores (el personalizador tiene todo). */
   const MENU = [
-    {
-      type: 'crepa', badge: 'Crepa Gourmet', emoji: '🥞',
-      desc: 'Crepa francesa suave y delgada, hecha al momento y rellena de lo que más se te antoje.',
-      photos: [{ src: './menu-crepa.jpg' }, { src: './crepa.png' }],
-      quick: { type: 'crepa', ingredients: ['nutella', 'fresas'] }
-    },
-    {
-      type: 'waffle', badge: 'Waffle Belga', emoji: '🧇',
-      desc: 'Dorado y crujiente por fuera, esponjoso por dentro. Pídelo con tus toppings favoritos.',
-      photos: [{ src: './menu-waffle.jpg' }, { src: './wafle.png' }],
-      quick: { type: 'waffle', ingredients: ['nutella', 'fresas'] }
-    },
-    {
-      type: 'fresas', badge: 'Fresas con Crema', emoji: '🍓',
-      desc: 'Fresas frescas del día con crema cremosita. Chicas o grandes, con los toppings que quieras.',
-      photos: [{ src: './menu-fresas.jpg' }, { src: './fresas con crema.png', fit: 'contain' }],
-      quick: { type: 'fresas', size: 'chica', ingredients: ['lechera'] }
-    },
-    {
-      type: 'yuki', badge: 'Yuki', emoji: '🍧',
-      desc: 'Nieve ultra fina en vaso. Elige tamaño y sabores: un sabor por cucharón servido.',
-      photos: [{ src: './menu-yuki.jpg' }, { src: './yuki limon.png', fit: 'contain' }],
-      quick: { type: 'yuki', size: 'chico', flavors: ['limon'] }
-    }
+    { id: 'crepa', title: 'Crepa', emoji: '🥞', photos: [{ src: './menu-crepa.jpg' }, { src: './crepa.png' }],
+      quick: { type: 'crepa', style: 'dulce', ingredients: ['nutella', 'fresa'] } },
+    { id: 'waffle', title: 'Waffle', emoji: '🧇', photos: [{ src: './menu-waffle.jpg' }, { src: './wafle.png' }],
+      quick: { type: 'waffle', ingredients: ['nutella', 'fresa'] } },
+    { id: 'fresas', title: 'Fresas con Crema', emoji: '🍓', photos: [{ src: './menu-fresas.jpg' }, { src: './fresas con crema.png', fit: 'contain' }],
+      quick: { type: 'fresas', size: 'chica', ingredients: ['lechera'] } },
+    { id: 'yuki', title: 'Yuki', emoji: '🍧', photos: [{ src: './menu-yuki.jpg' }, { src: './yuki limon.png', fit: 'contain' }],
+      quick: { type: 'yuki', size: 'chica', flavors: ['limon'] } },
+    { id: 'latte-spanish', latte: true, title: 'Ice Latte Spanish', emoji: '☕', photos: [] },
+    { id: 'latte-strawberry', latte: true, title: 'Ice Latte Strawberry', emoji: '🍓', photos: [] }
   ];
 
   /* Platillos YA HECHOS (se muestran con el póster completo, sin recortar, como anuncios).
      Ajusta nombre y contenido para que coincidan con lo que dice cada póster. */
   const PROMOS = [
-    { id: 'promo-crepa', name: 'Crepa de Nutella con Fresas', emoji: '🥞', photos: POSTER.crepa.map((src) => ({ src })),
-      spec: { type: 'crepa', ingredients: ['nutella', 'fresas'] } },
-    { id: 'promo-waffle', name: 'Waffle Belga Especial', emoji: '🧇', photos: POSTER.waffle.map((src) => ({ src })),
-      spec: { type: 'waffle', ingredients: ['nutella', 'fresas', 'lechera'] } },
-    { id: 'promo-fresas', name: 'Fresas con Crema Especial', emoji: '🍓', photos: POSTER.fresas.map((src) => ({ src })),
-      spec: { type: 'fresas', size: 'grande', ingredients: ['lechera', 'nuez'] } },
-    { id: 'promo-mango', name: 'Yuki de Mango', emoji: '🥭', photos: POSTER.mango.map((src) => ({ src })),
-      spec: { type: 'yuki', size: 'mediano', flavors: ['mango', 'limon'] } }
+    { id: 'promo-crepa', name: 'Crepa Classic', emoji: '🥞', photos: POSTER.crepa.map((src) => ({ src })),
+      spec: { type: 'crepa', style: 'dulce', ingredients: ['nutella', 'fresa'] } },
+    { id: 'promo-waffle', name: 'Waffle de Chocolate', emoji: '🧇', photos: POSTER.waffle.map((src) => ({ src })),
+      spec: { type: 'waffle', ingredients: ['nutella', 'fresa', 'lechera'] } },
+    { id: 'promo-jumbo', name: 'Fresas Jumbo', emoji: '🍓', photos: POSTER.fresas.map((src) => ({ src })),
+      spec: { type: 'fresas', size: 'jumbo', ingredients: ['lechera', 'nuez'] } }
   ];
 
   /* ------------------------------------------------------------------------
@@ -193,6 +211,7 @@
   function wireLinks() {
     $$('[data-wa]').forEach((a) => { a.href = waUrl(a.dataset.wa); a.target = '_blank'; a.rel = 'noopener'; });
     $$('[data-social]').forEach((a) => { a.href = CONFIG.social[a.dataset.social] || '#'; });
+    $$('[data-maps]').forEach((a) => { a.href = CONFIG.maps; a.target = '_blank'; a.rel = 'noopener'; });
   }
 
   const scrollToEl = (sel) => {
@@ -201,11 +220,20 @@
   };
 
   /* ---- Precios ---- */
+  const ingList = (spec) => (spec.type === 'crepa' && spec.style === 'salada' ? ING_SALTY : ING_SWEET);
+
   const normalizeSpec = (spec) => {
     const t = TYPES[spec.type];
-    const out = { type: spec.type, size: null, ingredients: [], flavors: [] };
+    const out = { type: spec.type, style: null, size: null, ingredients: [], flavors: [] };
+    if (t.styles) out.style = spec.style === 'salada' ? 'salada' : 'dulce';
     if (t.sizes) out.size = byId(t.sizes, spec.size) ? spec.size : t.sizes[0].id;
-    if (t.kind === 'ing' || t.kind === 'sized') out.ingredients = INGREDIENTS.map((i) => i.id).filter((id) => (spec.ingredients || []).includes(id));
+    if (t.kind === 'ing' || t.kind === 'sized') {
+      out.ingredients = ingList(out).map((i) => i.id).filter((id) => (spec.ingredients || []).includes(id));
+      if (out.style === 'salada') {                       // los aderezos son gratis, pero solo lleva uno
+        const sauces = out.ingredients.filter((id) => byId(ING_SALTY, id).group === 'sauce');
+        out.ingredients = out.ingredients.filter((id) => !sauces.includes(id) || id === sauces[0]);
+      }
+    }
     if (t.kind === 'flavors') {
       const max = byId(t.sizes, out.size).max;
       out.flavors = FLAVORS.map((f) => f.id).filter((id) => (spec.flavors || []).includes(id)).slice(0, max);
@@ -220,8 +248,21 @@
     if (t.kind === 'flavors') {
       const sz = byId(t.sizes, spec.size);
       const n = spec.flavors.length;
-      return { price: sz.price, count: n, max: sz.max, extras: 0, valid: n >= 1 && n <= sz.max,
-        hint: `Yuki ${sz.label} · ${n} de ${sz.max} sabores (un sabor por cucharón)`, unit: 'sabores' };
+      const extras = spec.flavors.includes('diablito') ? spec.flavors.filter((f) => f !== 'diablito').length : 0;
+      return { price: sz.price + extras * DIABLITO_EXTRA, count: n, max: sz.max, extras, valid: n >= 1 && n <= sz.max,
+        counter: `${n} de ${sz.max} sabores${extras ? ` · ${extras} sabor${extras > 1 ? 'es' : ''} con Diablito (+${money(extras * DIABLITO_EXTRA)})` : ''}`,
+        hint: extras ? `Diablito (limón, chamoy y chile en polvo) + ${extras} sabor${extras > 1 ? 'es' : ''} extra · +${money(DIABLITO_EXTRA)} c/u`
+          : `Yuki ${sz.label} · ${n} de ${sz.max} sabores (un sabor por cucharón)`, unit: 'sabores' };
+    }
+    if (spec.type === 'crepa' && spec.style === 'salada') {
+      const ids = spec.ingredients;
+      const grp = (g) => ids.filter((id) => byId(ING_SALTY, id).group === g);
+      const base = grp('base'), extras = grp('extra'), sauce = grp('sauce');
+      const basePrice = ids.includes('manchego') ? SALTY_PRICE.withManchego : SALTY_PRICE.base;
+      return { price: basePrice + extras.length * SALTY_PRICE.extra, count: ids.length, max: Infinity, extras: extras.length, valid: base.length >= 1,
+        counter: `${base.length} base · ${sauce.length} aderezo (gratis) · ${extras.length} extra${extras.length === 1 ? '' : 's'}${extras.length ? ` (+${money(extras.length * SALTY_PRICE.extra)})` : ''}`,
+        hint: base.length ? `${ids.includes('manchego') ? 'Con manchego' : 'Jamón / Philadelphia'} ${money(basePrice)}${extras.length ? ` + ${extras.length} extra${extras.length > 1 ? 's' : ''} (${money(extras.length * SALTY_PRICE.extra)})` : ''} · aderezo gratis (solo 1)`
+          : 'Elige jamón, Philadelphia y/o queso manchego', unit: 'toppings' };
     }
     const sz = t.sizes ? byId(t.sizes, spec.size) : t;
     const n = spec.ingredients.length;
@@ -234,6 +275,11 @@
 
   const specName = (spec) => {
     const t = TYPES[spec.type];
+    if (spec.type === 'crepa') {
+      if (spec.style === 'salada') return 'Crepa Salada';
+      const ing = spec.ingredients;                      // Crepa Classic = solo Nutella + Fresa; con otros toppings es "Crepa"
+      return ing.length === 2 && ing.includes('nutella') && ing.includes('fresa') ? 'Crepa Classic' : 'Crepa';
+    }
     const sz = t.sizes ? byId(t.sizes, spec.size) : null;
     return sz ? `${t.label} ${sz.label}` : t.label;
   };
@@ -243,25 +289,19 @@
       ? [`Sabores: ${labels(FLAVORS, spec.flavors).join(', ')}`]
       : [`Toppings: ${labels(INGREDIENTS, spec.ingredients).join(', ')}`];
   };
-  const specId = (spec) => `${spec.type}|${spec.size || ''}|${spec.ingredients.join(',')}|${spec.flavors.join(',')}`;
+  const specId = (spec) => `${spec.type}|${spec.style || ''}|${spec.size || ''}|${spec.ingredients.join(',')}|${spec.flavors.join(',')}`;
 
-  function defaultSpec(type) {
+  function defaultSpec(type, style) {
     const t = TYPES[type];
     if (t.kind === 'flavors') return { type, size: t.sizes[0].id, ingredients: [], flavors: ['limon'] };
     if (t.kind === 'sized') return { type, size: t.sizes[0].id, ingredients: ['lechera'], flavors: [] };
-    return { type, size: null, ingredients: ['nutella', 'fresas'], flavors: [] };
+    if (t.styles) return { type, style: style || 'dulce', ingredients: style === 'salada' ? ['jamon', 'philadelphia'] : ['nutella', 'fresa'], flavors: [] };
+    return { type, size: null, ingredients: ['nutella', 'fresa'], flavors: [] };
   }
   const minPrice = (type) => {
     const t = TYPES[type];
     return t.sizes ? Math.min(...t.sizes.map((s) => s.base || s.price)) : t.base;
   };
-  function ruleText(type) {
-    const t = TYPES[type];
-    if (t.kind === 'flavors') return `${t.sizes.map((s) => `${s.label} ${money(s.price)}`).join(' · ')} · un sabor por cucharón`;
-    if (t.kind === 'sized') return `${t.sizes.map((s) => `${s.label} ${money(s.base)} (${s.included} topping${s.included > 1 ? 's' : ''})`).join(' · ')} · extra +${money(EXTRA)}`;
-    return `Hasta ${t.included} toppings ${money(t.base)} · 3 toppings ${money(t.base + EXTRA)} · cada extra +${money(EXTRA)}`;
-  }
-
   /* ------------------------------------------------------------------------
      4 · NAVEGACIÓN Y UI
      ------------------------------------------------------------------------ */
@@ -355,29 +395,16 @@
      ------------------------------------------------------------------------ */
   function renderMenu() {
     $('#menu-grid').innerHTML = MENU.map((m) => {
-      const t = TYPES[m.type];
-      const chips = (t.kind === 'flavors' ? FLAVORS : INGREDIENTS).map((o) => `<li>${o.icon} ${esc(o.label)}</li>`).join('');
-      const quick = pricing(m.quick);
-      return `<article class="card">
-        <div class="card-media">
-          <span class="badge">${esc(m.badge)}</span>
-          ${photoHTML(m.photos, m.emoji, `${t.label} de Yukis Kikis`)}
-        </div>
+      const photo = photoHTML(m.photos, m.emoji, m.latte ? `${m.title} (foto próximamente)` : `${m.title} de Yukis Kikis`, m.latte ? 'is-soon' : '');
+      const soon = m.latte ? '<span class="soon-tag">Foto próximamente</span>' : '';
+      const btn = m.latte
+        ? `<a class="btn btn-yellow" href="#" data-wa="${esc(`¡Hola ${CONFIG.brand}! Quiero armar mi ${m.title}. ¿Me ayudan?`)}">Armar el mío</a>`
+        : `<button type="button" class="btn btn-yellow" data-build="${m.id}">Armar el mío</button>`;
+      return `<article class="card card-simple">
+        <div class="card-media">${photo}${soon}</div>
         <div class="card-body">
-          <h3>${esc(t.label)}</h3>
-          <p>${esc(m.desc)}</p>
-          <p class="chips-title">${t.kind === 'flavors' ? 'Sabores' : 'Toppings'}</p>
-          <ul class="chips">${chips}</ul>
-          <p class="rule">${esc(ruleText(m.type))}</p>
-          <div class="card-foot">
-            <span class="price"><small>Desde</small> ${money(minPrice(m.type))}</span>
-          </div>
-          <div class="card-actions">
-            <button type="button" class="btn btn-red" data-quick="${m.type}" aria-label="Agregar ${esc(specName(m.quick))} al carrito (${money(quick.price)})">
-              <i class="fa-solid fa-cart-plus" aria-hidden="true"></i> Agregar ${money(quick.price)}
-            </button>
-            <button type="button" class="btn btn-yellow" data-build="${m.type}">Armar el mío</button>
-          </div>
+          <h3>${esc(m.title)}</h3>
+          <div class="card-actions">${btn}</div>
         </div>
       </article>`;
     }).join('');
@@ -413,14 +440,12 @@
   if (hasGsap && !reducedMotion) {
     gsap.from('#menu-grid .card', { y: 46, opacity: 0, duration: 0.7, ease: 'power3.out', stagger: 0.12, scrollTrigger: { trigger: '#menu-grid', start: 'top 85%', once: true } });
   }
-
   /* ------------------------------------------------------------------------
      7 · CARRITO (editable)
      ------------------------------------------------------------------------ */
   let cart = [];                                   // [{ id, name, lines[], price, qty, spec }]
-  let deliveryKey = 'pickup';
-  const CART_KEY = 'yukiskikis_cart_v3';
-  const NOTES_KEY = 'yukiskikis_notes_v3';
+  const CART_KEY = 'yukiskikis_cart_v4';
+  const NOTES_KEY = 'yukiskikis_notes_v4';
 
   const cartModal = $('#cart-modal');
   const cartOverlay = $('#cart-overlay');
@@ -449,10 +474,8 @@
 
   const cartUnits = () => cart.reduce((n, i) => n + i.qty, 0);
   const cartSubtotal = () => cart.reduce((n, i) => n + i.price * i.qty, 0);
-  const cartFee = () => CONFIG.delivery[deliveryKey].fee;
 
   function orderMessage() {
-    const d = CONFIG.delivery[deliveryKey];
     const lines = cart.map((i) => {
       const unit = i.qty > 1 ? ` (${money(i.price)} c/u)` : '';
       return `• ${i.qty} x ${i.name} — ${money(i.price * i.qty)}${unit}\n${i.lines.map((l) => `   ${l}`).join('\n')}`;
@@ -460,8 +483,8 @@
     const notes = cartNotes.value.trim();
     return `¡Hola ${CONFIG.brand}! 🧇 Quiero hacer este pedido:\n\n${lines.join('\n')}\n\n` +
       `Subtotal: ${money(cartSubtotal())}\n` +
-      `Entrega: ${d.label}${d.fee ? ` (${money(d.fee)})` : ' (gratis)'}\n` +
-      `*Total: ${money(cartSubtotal() + d.fee)}*` +
+      `*Total: ${money(cartSubtotal())}*` +
+      `\n(Si pido envío a domicilio, se cobra por separado.)` +
       (notes ? `\n\nNotas: ${notes}` : '') +
       `\n\n¿Me confirman tiempo de entrega? ¡Gracias!`;
   }
@@ -496,8 +519,7 @@
     cartFoot.classList.toggle('is-empty', empty);
     $('#cart-clear').hidden = empty;
     $('#cart-subtotal').textContent = money(cartSubtotal());
-    $('#cart-fee').textContent = cartFee() ? money(cartFee()) : 'Gratis';
-    $('#cart-total').textContent = money(cartSubtotal() + cartFee());
+    $('#cart-total').textContent = money(cartSubtotal());
     $('#cart-wa').disabled = empty;
   }
 
@@ -551,15 +573,12 @@
     if (lastFocus && lastFocus.focus && document.contains(lastFocus)) lastFocus.focus({ preventScroll: true });
   }
 
-  cartModal.addEventListener('change', (e) => {
-    if (e.target.name === 'delivery') { deliveryKey = e.target.value; renderCart(); }
-  });
   cartNotes.addEventListener('input', () => store.set(NOTES_KEY, cartNotes.value));
 
   /* ------------------------------------------------------------------------
      8 · PERSONALIZADOR "ARMA TU ANTOJO KIKIS"
      ------------------------------------------------------------------------ */
-  const B = { type: 'waffle', size: null, ingredients: [], flavors: [], step: 0, editing: null };
+  const B = { type: 'waffle', style: null, size: null, ingredients: [], flavors: [], step: 0, editing: null };
   const bDots = $('#b-dots');
   const bPanel = $('#b-panel');
   const bPrev = $('#step-prev');
@@ -567,12 +586,12 @@
   const bAdd = $('#builder-add');
   const bReview = $('#builder-review');
 
-  const bSpec = () => normalizeSpec({ type: B.type, size: B.size, ingredients: B.ingredients, flavors: B.flavors });
+  const bSpec = () => normalizeSpec({ type: B.type, style: B.style, size: B.size, ingredients: B.ingredients, flavors: B.flavors });
   const bSteps = () => TYPES[B.type].steps;
 
   function setBuilderSpec(spec) {
     const s = normalizeSpec(spec);
-    B.type = s.type; B.size = s.size; B.ingredients = s.ingredients.slice(); B.flavors = s.flavors.slice();
+    B.type = s.type; B.style = s.style; B.size = s.size; B.ingredients = s.ingredients.slice(); B.flavors = s.flavors.slice();
   }
 
   function optCard(type, name, id, checked, icon, title, sub) {
@@ -598,21 +617,26 @@
       html = `<fieldset class="b-step"><legend>¿Qué se te antoja?</legend><div class="opts opts-4">` +
         Object.entries(TYPES).map(([k, v]) => optCard('radio', 'type', k, B.type === k, v.icon, v.label, `Desde ${money(minPrice(k))}`)).join('') +
         `</div></fieldset>`;
+    } else if (id === 'style') {
+      html = `<fieldset class="b-step"><legend>¿Dulce o salada?</legend><div class="opts opts-2">` +
+        optCard('radio', 'style', 'dulce', B.style === 'dulce', '🍫', 'Dulce', 'Desde $80 · Nutella, fresa, cajeta…') +
+        optCard('radio', 'style', 'salada', B.style === 'salada', '🧀', 'Salada', 'Desde $80 · jamón, queso, peperoni…') +
+        `</div></fieldset>`;
     } else if (id === 'size') {
       html = `<fieldset class="b-step"><legend>Elige el tamaño</legend><div class="opts opts-${t.sizes.length === 2 ? '2' : '3'}">` +
-        t.sizes.map((s) => optCard('radio', 'size', s.id, B.size === s.id, s.id === t.sizes[0].id ? '🥤' : '🧋',
+        t.sizes.map((s) => optCard('radio', 'size', s.id, B.size === s.id, ['🥤', '🧋', '🥛'][t.sizes.indexOf(s)] || '🥤',
           `${s.label} · ${money(s.base || s.price)}`,
           t.kind === 'flavors' ? `Hasta ${s.max} sabor${s.max > 1 ? 'es' : ''}` : `Incluye ${s.included} topping${s.included > 1 ? 's' : ''}`)).join('') +
         `</div></fieldset>`;
     } else if (id === 'ing') {
       html = `<fieldset class="b-step"><legend>Escoge tus toppings <small>(untables y toppings cuentan igual)</small></legend>` +
         `<p class="b-counter" id="b-counter"></p><div class="opts opts-5">` +
-        INGREDIENTS.map((o) => optCard('checkbox', 'ing', o.id, B.ingredients.includes(o.id), o.icon, o.label, '')).join('') +
+        ingList(bSpec()).map((o) => optCard('checkbox', 'ing', o.id, B.ingredients.includes(o.id), o.icon, o.label, o.sub || '')).join('') +
         `</div></fieldset>`;
     } else if (id === 'flavors') {
       html = `<fieldset class="b-step"><legend>Elige tus sabores <small>(un sabor por cucharón)</small></legend>` +
         `<p class="b-counter" id="b-counter"></p><div class="opts opts-5">` +
-        FLAVORS.map((o) => optCard('checkbox', 'flavor', o.id, B.flavors.includes(o.id), o.icon, o.label, '')).join('') +
+        FLAVORS.map((o) => optCard('checkbox', 'flavor', o.id, B.flavors.includes(o.id), o.icon, o.label, o.sub || '')).join('') +
         `</div></fieldset>`;
     } else {
       const spec = bSpec();
@@ -638,7 +662,7 @@
 
     const counter = $('#b-counter');
     if (counter) {
-      counter.textContent = id === 'flavors'
+      counter.textContent = pr.counter ? pr.counter : id === 'flavors'
         ? `${pr.count} de ${pr.max} sabores`
         : `${pr.count} topping${pr.count === 1 ? '' : 's'} · ${pr.extras ? `${pr.extras} extra${pr.extras > 1 ? 's' : ''} (+${money(pr.extras * EXTRA)})` : `incluye ${pr.included}`}`;
     }
@@ -682,10 +706,18 @@
     if (t.name === 'type') {
       setBuilderSpec(defaultSpec(t.value));
       renderDots();
+    } else if (t.name === 'style') {
+      B.style = t.value;
+      B.ingredients = normalizeSpec({ type: B.type, style: B.style, ingredients: B.ingredients }).ingredients;
+      if (!B.ingredients.length) B.ingredients = defaultSpec(B.type, B.style).ingredients;
     } else if (t.name === 'size') {
       B.size = t.value;
       if (TYPES[B.type].kind === 'flavors') B.flavors = B.flavors.slice(0, byId(TYPES[B.type].sizes, B.size).max);
     } else if (t.name === 'ing') {
+      if (t.checked && B.type === 'crepa' && B.style === 'salada' && byId(ING_SALTY, t.value).group === 'sauce') {
+        $$('input[name="ing"]:checked', bPanel).forEach((i) => { if (i !== t && byId(ING_SALTY, i.value).group === 'sauce') i.checked = false; });
+        toast('Los aderezos son gratis, pero lleva solo uno 😉');
+      }
       B.ingredients = $$('input[name="ing"]:checked', bPanel).map((i) => i.value);
     } else if (t.name === 'flavor') {
       const max = byId(TYPES[B.type].sizes, B.size).max;
@@ -725,7 +757,6 @@
   }
   bAdd.addEventListener('click', () => commitBuilder(false));
   bReview.addEventListener('click', () => commitBuilder(true));
-
   /* ------------------------------------------------------------------------
      9 · ENVIAR PEDIDO: pregunta previa + aviso final
      ------------------------------------------------------------------------ */
@@ -749,7 +780,7 @@
   /* 1) Antes de mandar: ¿quiere añadir otra cosa? */
   function askBeforeSend() {
     if (!cart.length) { toast('Agrega algo a tu pedido primero 🧇'); return; }
-    $('#ask-summary').textContent = `${cartUnits()} artículo${cartUnits() === 1 ? '' : 's'} · Total ${money(cartSubtotal() + cartFee())}`;
+    $('#ask-summary').textContent = `${cartUnits()} artículo${cartUnits() === 1 ? '' : 's'} · Total ${money(cartSubtotal())}`;
     showModal(askModal, '#ask-send');
   }
 
@@ -769,9 +800,9 @@
   /* Un solo listener delegado para todos los botones de la página */
   document.addEventListener('click', (e) => {
     const q = e.target.closest('[data-quick]');
-    if (q) { addToCart(MENU.find((m) => m.type === q.dataset.quick).quick); return; }
+    if (q) { addToCart(MENU.find((m) => m.id === q.dataset.quick).quick); return; }
     const build = e.target.closest('[data-build]');
-    if (build) { openBuilder(defaultSpec(build.dataset.build)); return; }
+    if (build) { openBuilder(MENU.find((m) => m.id === build.dataset.build).quick); return; }
     const promo = e.target.closest('[data-promo]');
     if (promo) { addToCart(PROMOS.find((p) => p.id === promo.dataset.promo).spec); return; }
     const pEdit = e.target.closest('[data-promo-edit]');
@@ -801,8 +832,6 @@
     if (e.target.closest('#order-reset')) {
       hideModal(orderModal);
       cart = [];
-      deliveryKey = 'pickup';
-      $('input[name="delivery"][value="pickup"]').checked = true;
       cartNotes.value = '';
       store.set(NOTES_KEY, '');
       saveCart();
@@ -882,13 +911,13 @@
 
   /* ------------------------------------------------------------------------
      11 · HERO: VIDEO ALEATORIO A PANTALLA COMPLETA CONTROLADO POR SCROLL
-     · Se alternan video_crepa_2.mp4 y video_yuki.mp4 (si uno falla, se prueba el otro).
+     · Se alternan video_crepa_nuevo.mp4 y video_yuki_mango.mp4 (si uno falla, se prueba el otro).
      · El video se descarga completo a memoria (blob): así siempre se puede "saltar" a cualquier
        cuadro y el scroll va fluido, aunque el servidor no soporte rangos de bytes.
      · Si el video se pierde, se reintenta solo (sin tener que recargar la página).
      Consejo de exportación (ffmpeg) para el scrub más fluido, cada cuadro es clave:
        ffmpeg -i entrada.mp4 -an -vf "scale=960:-2,fps=30" -c:v libx264 -crf 28 \
-              -g 1 -keyint_min 1 -pix_fmt yuv420p -movflags +faststart video_crepa_2.mp4
+              -g 1 -keyint_min 1 -pix_fmt yuv420p -movflags +faststart video_crepa_nuevo.mp4
      ------------------------------------------------------------------------ */
   const hero = $('#inicio');
   const heroStage = $('#hero-sticky');
@@ -1157,6 +1186,19 @@
   /* ------------------------------------------------------------------------
      Arranque
      ------------------------------------------------------------------------ */
+  function renderMap() {
+    const coords = CONFIG.coords.replace(/\s+/g, '');
+    const q = coords || CONFIG.address || CONFIG.mapQuery;
+    const src = CONFIG.mapEmbed || (q ? `https://www.google.com/maps?q=${encodeURIComponent(q)}${coords ? '&z=17' : ''}&output=embed&hl=es` : '');
+    if (!src) return;
+    const frame = $('#map-frame');
+    $('.map-link', frame).remove();
+    frame.classList.remove('map-card');
+    frame.insertAdjacentHTML('afterbegin', `<iframe title="Mapa de Yukis Kikis en Monterrey" src="${esc(src)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>` +
+      `<a class="map-open btn btn-yellow" href="${esc(CONFIG.maps)}" target="_blank" rel="noopener"><i class="fa-solid fa-diamond-turn-right" aria-hidden="true"></i> Abrir en Google Maps</a>`);
+    if (CONFIG.address) { const p = $('#loc-address'); $('span', p).textContent = CONFIG.address; p.hidden = false; }
+  }
+  renderMap();
   wireLinks();
   measure();
   onScroll();

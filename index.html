@@ -59,12 +59,12 @@
       <div class="hero-sticky" id="hero-sticky">
 
         <!-- El video ocupa toda la pantalla, centrado y sin filtros que lo oscurezcan -->
-        <!-- El src lo asigna app.js al cargar: elige al azar entre video_crepa_2.mp4 y video_yuki.mp4 -->
+        <!-- El src lo asigna app.js al cargar: elige al azar entre video_crepa_nuevo.mp4 y video_yuki_mango.mp4 -->
         <video id="scroll-video" class="hero-fullscreen-video"
                muted playsinline webkit-playsinline preload="auto" disablepictureinpicture disableremoteplayback
                aria-label="Video de postres Yukis Kikis que avanza mientras haces scroll"></video>
         <!-- Respaldo si el video no carga: la foto real, también a pantalla completa -->
-        <img class="hero-fullscreen-fallback" id="video-fallback" src="./crepa_2.png" alt="Crepa gourmet de Yukis Kikis" />
+        <img class="hero-fullscreen-fallback" id="video-fallback" src="./poster-crepa.jpg" alt="Crepa gourmet de Yukis Kikis" />
 
         <!-- Solo un degradado radial sutil detrás del texto (el centro queda libre) -->
         <div class="hero-scrim" aria-hidden="true"></div>
@@ -98,7 +98,7 @@
         <header class="section-head" data-reveal>
           <span class="pill pill-blue">Nuestro menú</span>
           <h2>Antojos que sí se ven <span class="u-red">así de ricos</span></h2>
-          <p>Elige tu favorito y arma el tuyo con los toppings que quieras. Cada ingrediente extra cuesta solo $10.</p>
+          <p>Elige qué se te antoja y arma el tuyo a tu gusto. El precio se actualiza solito.</p>
         </header>
         <div class="gallery" id="menu-grid"></div>
 
@@ -106,8 +106,8 @@
         <div class="promos" id="promos">
           <header class="section-head promos-head" data-reveal>
             <span class="pill pill-red">Ya listos para pedir</span>
-            <h2>Nuestros <span class="u-blue">favoritos</span></h2>
-            <p>Platillos armados por nosotros. Agrégalos tal cual o edítalos a tu gusto.</p>
+            <h2><span class="u-blue">Especiales</span></h2>
+            <p>Nuestros platillos ya armados. Agrégalos tal cual o edítalos a tu gusto.</p>
           </header>
           <div class="promo-grid" id="promo-grid"></div>
         </div>
@@ -149,16 +149,11 @@
     <!-- ============ NUESTRA MARCA ============ -->
     <section class="section" id="marca">
       <div class="wrap brand-grid">
-        <figure class="mural" data-reveal>
-          <img id="mural-img" src="./image_f494dc.jpg" alt="Crepas y waffles hechos al momento en Yukis Kikis, Monterrey" loading="lazy" decoding="async" />
-          <div class="mural-missing" aria-hidden="true">
-            <img src="./logo_nuevo_icono.png" onerror="this.onerror=null;this.src='./logo-2.jpeg'" alt="" />
-          </div>
-          <span class="sticker sticker-mural" aria-hidden="true">Hechos<br />al momento</span>
+        <figure class="brand-figure" data-reveal>
+          <img src="./logo_nuevo.jpg" alt="Logotipo de Yukis Kikis: dos K azules con destellos amarillos" width="900" height="600" loading="lazy" decoding="async" />
         </figure>
 
         <div class="brand-copy" data-reveal>
-          <img class="brand-logo" src="./logo_nuevo.jpg" alt="Logotipo de Yukis Kikis: dos K azules con destellos amarillos" width="420" height="280" loading="lazy" decoding="async" />
           <span class="pill pill-red">Nuestra Marca</span>
           <h2>Antojos Felices <span class="u-blue">Desde Siempre</span></h2>
           <p>En Yukis Kikis nacimos en Monterrey con una idea muy sencilla: que un postre te cambie el día. Cada crepa, waffle y Yuki se prepara al momento, con fruta fresca que llega diario y nieve ultra fina hecha con cariño.</p>
@@ -167,7 +162,7 @@
             <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Fruta fresca todos los días</li>
             <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Nieve ultra fina</li>
             <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Waffles y crepas hechos al momento</li>
-            <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Envío a domicilio en Monterrey</li>
+            <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Envío a domicilio disponible (se cobra por separado)</li>
           </ul>
         </div>
       </div>
@@ -200,40 +195,30 @@
       </div>
     </section>
 
-    <!-- ============ UBICACIÓN & DELIVERY ============ -->
+    <!-- ============ UBICACIÓN ============ -->
     <section class="section section-pink" id="ubicacion">
       <div class="wrap loc-grid">
         <div class="loc-copy" data-reveal>
-          <span class="pill pill-red">Ubicación & Delivery</span>
-          <h2>Te lo llevamos o <span class="u-blue">pasa por él</span></h2>
-          <p>Estamos en Monterrey, Nuevo León. Escríbenos por WhatsApp para confirmar tu zona y tiempo de entrega.</p>
+          <span class="pill pill-red">Ubicación</span>
+          <h2>Pasa por tu <span class="u-blue">antojo</span></h2>
+          <p>Estamos en Monterrey, Nuevo León. Abre la ubicación en Google Maps y llega directo a Yukis Kikis.</p>
+          <p class="loc-address" id="loc-address" hidden><i class="fa-solid fa-location-dot" aria-hidden="true"></i> <span></span></p>
+          <p class="ship-note"><i class="fa-solid fa-motorcycle" aria-hidden="true"></i> ¿Envío a domicilio? Escríbenos por WhatsApp. <b>El envío se cobra por separado.</b></p>
 
-          <ul class="zones">
-            <li class="zone">
-              <span class="zone-price">$25<small>MXN</small></span>
-              <div><b>Zona 1</b><span>Colonias cercanas a la sucursal</span></div>
-            </li>
-            <li class="zone">
-              <span class="zone-price">$35<small>MXN</small></span>
-              <div><b>Zona 2</b><span>Colonias más alejadas</span></div>
-            </li>
-            <li class="zone zone-free">
-              <span class="zone-price">GRATIS</span>
-              <div><b>Pick-up</b><span>Pasa a recoger tu pedido</span></div>
-            </li>
-          </ul>
+          <div class="loc-actions">
+            <a class="btn btn-red btn-lg" href="#" data-maps><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Cómo llegar</a>
+            <a class="btn btn-wa btn-lg" href="#" data-wa="¡Hola Yukis Kikis! Tengo una pregunta sobre un pedido a domicilio."><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Escríbenos por WhatsApp</a>
+          </div>
+        </div>
 
-          <a class="btn btn-wa btn-lg" href="#" data-wa="¡Hola Yukis Kikis! Quiero pedir a domicilio. Mi colonia es: ">
-            <i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Escríbenos por WhatsApp
+        <div class="map-frame map-card" id="map-frame" data-reveal>
+          <a class="map-link" href="#" data-maps aria-label="Abrir la ubicación de Yukis Kikis en Google Maps">
+            <span class="map-pin"><i class="fa-solid fa-location-dot" aria-hidden="true"></i></span>
+            <b>Yukis Kikis · Monterrey, N.L.</b>
+            <span class="btn btn-yellow">Abrir en Google Maps</span>
           </a>
-        </div>
-
-        <div class="map-frame" data-reveal>
-          <iframe title="Mapa de Monterrey, Nuevo León"
-                  src="https://www.google.com/maps?q=Monterrey,+Nuevo+Le%C3%B3n,+M%C3%A9xico&output=embed"
-                  loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
           <span class="sticker sticker-map" aria-hidden="true"><i class="fa-solid fa-location-dot"></i> Monterrey</span>
-        </div>
+</div>
       </div>
     </section>
   </main>
@@ -251,7 +236,6 @@
         <div class="socials" aria-label="Redes sociales">
           <a href="#" data-social="instagram" aria-label="Instagram" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i></a>
           <a href="#" data-social="facebook" aria-label="Facebook" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-f"></i></a>
-          <a href="#" data-social="tiktok" aria-label="TikTok" target="_blank" rel="noopener"><i class="fa-brands fa-tiktok"></i></a>
           <a href="#" data-wa="Hola Yukis Kikis" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
         </div>
       </div>
@@ -263,7 +247,7 @@
         <a href="#personaliza">Arma tu Antojo</a>
         <a href="#marca">Nuestra Marca</a>
         <a href="#horario">Horario</a>
-        <a href="#ubicacion">Ubicación y Delivery</a>
+        <a href="#ubicacion">Ubicación</a>
       </nav>
 
       <div class="footer-status">
@@ -291,15 +275,9 @@
     </div>
 
     <footer class="cart-foot" id="cart-foot">
-      <fieldset class="cart-delivery">
-        <legend>¿Cómo lo quieres?</legend>
-        <label><input type="radio" name="delivery" value="pickup" checked /> <span>Pick-up <b>Gratis</b></span></label>
-        <label><input type="radio" name="delivery" value="z1" /> <span>Zona 1 <b>$25</b></span></label>
-        <label><input type="radio" name="delivery" value="z2" /> <span>Zona 2 <b>$35</b></span></label>
-      </fieldset>
+      <p class="cart-ship"><i class="fa-solid fa-motorcycle" aria-hidden="true"></i> Envío a domicilio: <b>se cobra por separado</b>.</p>
       <dl class="cart-totals">
         <div><dt>Subtotal</dt><dd id="cart-subtotal">$0</dd></div>
-        <div><dt>Envío</dt><dd id="cart-fee">$0</dd></div>
         <div class="cart-total"><dt>Total</dt><dd id="cart-total">$0</dd></div>
       </dl>
       <label class="cart-notes">
