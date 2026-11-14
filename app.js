@@ -34,9 +34,10 @@
       facebook: 'https://www.facebook.com/share/1CQ5jbjxVg/?mibextid=wwXIfr'
     },
     heroVideos: [                        // se alternan entre visitas; usa ?video=yuki o ?video=crepa para forzar uno
-      { key: 'crepa', src: './video_crepa_nuevo.mp4', poster: '' },
-      { key: 'yuki', src: './video_yuki_mango.mp4', poster: '' }
+      { key: 'crepa', src: './video_crepa_nuevo.mp4', srcMobile: './video_crepa_nuevo_cel.mp4', poster: '' },
+      { key: 'yuki', src: './video_yuki_mango.mp4', srcMobile: './video_yuki_mango_cel.mp4', poster: '' }
     ],
+    mobileQuery: '(max-width: 768px)',   // celulares: usan los videos _cel; computadora y tablet grande usan los de siempre
     video: {
       scrub: 0.5,                        // suavizado de GSAP ScrollTrigger (0.5 – 1)
       smoothing: 0.18,                   // suavizado de respaldo si GSAP no cargó
@@ -985,7 +986,11 @@
       const from = pool.length ? pool : list;
       first = from[Math.floor(Math.random() * from.length)];
     }
-    return [first, ...list.filter((v) => v !== first)];
+    const ordered = [first, ...list.filter((v) => v !== first)];
+    const isMobile = window.matchMedia && window.matchMedia(CONFIG.mobileQuery).matches;
+    if (!isMobile) return ordered;
+    // En celular: primero el video _cel; si no existe, se usa el de computadora como respaldo
+    return ordered.flatMap((v) => (v.srcMobile ? [{ ...v, src: v.srcMobile }, v] : [v]));
   }
 
   async function startHeroVideo(i) {
