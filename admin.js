@@ -263,32 +263,42 @@ async function saveDraft(extra = {}) {
 }
 
 /* ---------- Puestos ---------- */
+const LOCAL = { id: 'local', market: 'Nuestro local', name: 'Av. de los Astros 1305', where: 'Horario normal: martes a domingo', opens: '18:00', closes: '22:30', day: -1 };
 function stallLive(s) {
   const ov = (S.config.puestos || {})[s.id];
   const live = ov && ov.date === todayStr() ? ov : null;
-  return { avail: live && typeof live.available === 'boolean' ? live.available : s.available !== false, note: live ? (live.note || '') : '', fromAdmin: !!live };
+  let mode = 'auto';
+  if (live && live.forceOpen) mode = 'open'; else if (live && live.available === false) mode = 'closed';
+  else if (!live && s.available === false) mode = 'closed';
+  return { mode, note: live ? (live.note || '') : '' };
 }
 function viewStalls() {
   const d = todayDay();
-  const today = PUESTOS.filter((s) => s.day === d);
+  const today = [LOCAL, ...PUESTOS.filter((s) => s.day === d)];
   const others = PUESTOS.filter((s) => s.day !== d);
+  const lbl = { open: '🟢 Abierto (antes de hora)', closed: '⛔ Cerrado hoy', auto: '⏱ Según horario' };
   const card = (s) => {
     const st = stallLive(s);
     return `<div class="card stall" data-stall="${esc(s.id)}">
-      <div><h3>${esc(s.market)} · ${esc(s.name)}</h3><p class="muted">${esc(s.where || '')} · ${esc(s.opens)}–${esc(s.closes)}</p></div>
-      <div class="switch"><button class="open ${st.avail ? 'on' : ''}" data-avail="1">✅ Abierto</button><button class="closed ${!st.avail ? 'on' : ''}" data-avail="0">⛔ Cerrado hoy</button></div>
+      <div><h3>${esc(s.market)}${s.id === 'local' ? '' : ' · ' + esc(s.name)}</h3><p class="muted">${esc(s.where || '')} · ${esc(s.opens)}–${esc(s.closes)}</p>
+      <p><span class="tag ${st.mode === 'open' ? 'entregado' : st.mode === 'closed' ? 'nuevo' : ''}">${lbl[st.mode]}</span></p></div>
+      <div class="switch3"><button class="open ${st.mode === 'open' ? 'on' : ''}" data-mode="open">🟢 Abrir ya</button><button class="closed ${st.mode === 'closed' ? 'on' : ''}" data-mode="closed">⛔ Cerrado hoy</button><button class="auto ${st.mode === 'auto' ? 'on' : ''}" data-mode="auto">⏱ Horario</button></div>
       <input class="note" data-note placeholder="Mensaje opcional (ej. Cerramos por lluvia 🌧️)" value="${esc(st.note)}" maxlength="140" />
       <button class="btn small" data-savenote>Guardar mensaje</button>
     </div>`;
   };
-  return `<p class="muted">Lo que marques aquí se refleja en la página para <b>hoy</b> (${DAY_NAMES[d]}). Mañana vuelve al horario normal automáticamente.</p>
-    ${today.length ? `<div class="row"><button class="btn small" data-allstalls="1">Abrir todos</button><button class="btn small danger" data-allstalls="0">Cerrar todos</button></div>${today.map(card).join('')}` : '<p class="empty">Hoy no hay puestos programados.</p>'}
+  return `<p class="muted">Sin tocar nada, cada lugar abre y cierra según su horario. Usa <b>Abrir ya</b> si llegas antes, o <b>Cerrado hoy</b> si no abres. Se reinicia solo mañana. (${DAY_PLAIN[d]})</p>
+    ${PUESTOS.length ? '' : '<p class="error">No se pudo cargar la lista de puestos (puestos.js). Revisa que esté subido en la carpeta principal.</p>'}
+    <div class="row"><button class="btn small" data-allstalls="open">Abrir todos</button><button class="btn small danger" data-allstalls="closed">Cerrar todos</button></div>
+    ${today.map(card).join('')}
     ${others.length ? `<div class="card"><h2>Otros días</h2>${others.map((s) => `<p class="muted">${esc(DAY_NAMES[s.day])}: ${esc(s.market)} · ${esc(s.name)} (${esc(s.opens)}–${esc(s.closes)})</p>`).join('')}</div>` : ''}`;
 }
-async function setStall(id, avail, note) {
+const DAY_PLAIN = ['hoy domingo', 'hoy lunes', 'hoy martes', 'hoy miércoles', 'hoy jueves', 'hoy viernes', 'hoy sábado'];
+const modeData = (mode, note) => ({ available: mode !== 'closed', forceOpen: mode === 'open', date: todayStr(), note: note || '' });
+async function setStall(id, mode, note) {
   try {
-    await setDoc(doc(db, 'config', 'site'), { puestos: { [id]: { available: avail, date: todayStr(), note: note || '' } } }, { merge: true });
-    toast(avail ? 'Puesto marcado como abierto ✅' : 'Puesto marcado como cerrado hoy');
+    await setDoc(doc(db, 'config', 'site'), { puestos: { [id]: modeData(mode, note) } }, { merge: true });
+    toast(mode === 'open' ? 'Abierto ✅' : mode === 'closed' ? 'Cerrado por hoy' : 'Vuelve al horario normal');
   } catch (e) { toast(errText(e)); }
 }
 
@@ -357,21 +367,22 @@ document.addEventListener('click', async (e) => {
   }
 
   /* puestos */
+  const find = (id) => (id === 'local' ? LOCAL : PUESTOS.find((x) => x.id === id));
   const sc = t.closest('[data-stall]');
   if (sc) {
     const id = sc.dataset.stall;
-    const av = t.closest('[data-avail]');
-    if (av) return setStall(id, av.dataset.avail === '1', $('[data-note]', sc).value.trim());
-    if (t.closest('[data-savenote]')) return setStall(id, stallLive(PUESTOS.find((s) => s.id === id)).avail, $('[data-note]', sc).value.trim());
+    const md = t.closest('[data-mode]');
+    if (md) return setStall(id, md.dataset.mode, $('[data-note]', sc).value.trim());
+    if (t.closest('[data-savenote]')) return setStall(id, stallLive(find(id)).mode, $('[data-note]', sc).value.trim());
   }
   const all = t.closest('[data-allstalls]');
   if (all) {
-    const d = todayDay(), val = all.dataset.allstalls === '1';
+    const d = todayDay(), mode = all.dataset.allstalls;
     try {
       const puestos = {};
-      PUESTOS.filter((s) => s.day === d).forEach((s) => { puestos[s.id] = { available: val, date: todayStr(), note: (S.config.puestos?.[s.id]?.date === todayStr() ? S.config.puestos[s.id].note : '') || '' }; });
+      [LOCAL, ...PUESTOS.filter((s) => s.day === d)].forEach((s) => { puestos[s.id] = modeData(mode, stallLive(s).note); });
       await setDoc(doc(db, 'config', 'site'), { puestos }, { merge: true });
-      toast(val ? 'Todos abiertos ✅' : 'Todos cerrados hoy');
+      toast(mode === 'open' ? 'Todos abiertos ✅' : 'Todos cerrados hoy');
     } catch (ex) { toast(errText(ex)); }
     return;
   }

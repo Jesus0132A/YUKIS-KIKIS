@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Yukis Kikis · Panel</title>
+  <meta name="theme-color" content="#0038E2" />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icon-192.png" />
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="YK Panel" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./admin.css?v=2" />
+</head>
+<body>
+  <!-- Login -->
+  <main id="login" class="login" hidden>
+    <form id="login-form" class="login-card" autocomplete="on">
+      <img src="./icon-192.png" alt="" width="88" height="88" />
+      <h1>Yukis Kikis</h1>
+      <p>Panel de administración</p>
+      <label>Correo<input id="l-email" type="email" autocomplete="username" required /></label>
+      <label>Contraseña<input id="l-pass" type="password" autocomplete="current-password" required /></label>
+      <p id="l-error" class="error" role="alert" hidden></p>
+      <button class="btn primary" type="submit" id="l-btn">Entrar</button>
+    </form>
+  </main>
+
+  <!-- App -->
+  <div id="app" hidden>
+    <header class="top">
+      <h1 id="top-title">Pedidos</h1>
+      <span id="conn" class="conn" title="Conexión">●</span>
+    </header>
+    <main id="view" class="view"></main>
+    <nav class="tabs" id="tabs" aria-label="Secciones">
+      <button data-tab="orders" class="on"><span>🧾</span>Pedidos<i id="badge" hidden>0</i></button>
+      <button data-tab="stalls"><span>🏪</span>Puestos</button>
+      <button data-tab="prices"><span>💲</span>Precios</button>
+      <button data-tab="more"><span>⚙️</span>Más</button>
+    </nav>
+  </div>
+
+  <!-- Hoja de detalle -->
+  <div id="sheet" class="sheet" hidden>
+    <div class="sheet-back" data-close></div>
+    <div class="sheet-card" role="dialog" aria-modal="true" aria-label="Detalle del pedido"></div>
+  </div>
+  <div id="toast" class="toast" role="status" hidden></div>
+
+  <script src="../puestos.js"></script>
+  <script type="module" src="./admin.js?v=2"></script>
+</body>
+</html>

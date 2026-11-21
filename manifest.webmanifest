@@ -2,7 +2,7 @@
   "name": "Yukis Kikis · Panel",
   "short_name": "YK Panel",
   "description": "Panel de administración de Yukis Kikis",
-  "start_url": "./index.html",
+  "start_url": "./panel.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",

@@ -115,3 +115,9 @@ textarea { resize: vertical; min-height: 70px; }
 
 .toast { position: fixed; left: 50%; bottom: calc(86px + var(--safe-b)); transform: translateX(-50%); z-index: 40; background: var(--ink); color: #fff; padding: 11px 18px; border-radius: 999px; font-weight: 600; max-width: 92vw; text-align: center; }
 .empty { text-align: center; color: var(--muted); padding: 30px 10px; }
+
+.switch3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+.switch3 button { border: 3px solid var(--line); background: #fff; border-radius: 14px; padding: 12px 4px; font-weight: 800; font-size: .8rem; cursor: pointer; }
+.switch3 .open.on { background: var(--green); color: #fff; border-color: var(--green); }
+.switch3 .closed.on { background: var(--red); color: #fff; border-color: var(--red); }
+.switch3 .auto.on { background: var(--ink); color: #fff; border-color: var(--ink); }
