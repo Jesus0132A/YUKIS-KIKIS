@@ -742,3 +742,8 @@ body.cart-open, body.modal-open { overflow: hidden; }
 .cart-actions-row:has(#cart-clear[hidden]) { grid-template-columns: 1fr; }
 .cart-body .cart-notes { margin-top: 2px; }
 .cart-totals .cart-total { border-top: 0; padding-top: 0; margin-top: 0; }
+
+/* Aviso del sitio (se edita desde la app de administración) */
+.site-notice { margin: -10px 0 8px; padding: 8px 16px; text-align: center; font-weight: 700; font-size: .85rem; line-height: 1.35;
+  background: var(--yellow, #FFC700); color: #1d1d3b; }
+.site-notice[hidden] { display: none; }

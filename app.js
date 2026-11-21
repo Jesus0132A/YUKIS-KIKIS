@@ -66,7 +66,14 @@
   /* ------------------------------------------------------------------------
      2 · CATÁLOGO Y PRECIOS (todo en MXN, edítalo aquí)
      ------------------------------------------------------------------------ */
-  const EXTRA = 10;                      // cada ingrediente extra
+  let EXTRA = 10;                        // cada ingrediente extra
+
+  /* Conexión con la app de administración (Firebase). Si falla, la página usa los valores de este archivo. */
+  const FB = { project: 'yukis-kikis', key: 'AIzaSyBGKEdHsQ3fJJf_cyt5Nb1aOlniVm_VNGk' };
+  const FS_BASE = `https://firestore.googleapis.com/v1/projects/${FB.project}/databases/(default)/documents`;
+  let REMOTE = { notice: null, puestos: {} };
+  const PRICE_DEFAULTS = { crepa_base: 80, waffle_base: 80, extra_topping: 10, fresas_chica: 80, fresas_grande: 100, fresas_jumbo: 130,
+    yuki_chica: 40, yuki_mediana: 50, yuki_grande: 90, salada_base: 80, salada_manchego: 90, salada_extra: 15, diablito_extra: 10 };
 
   /* Crepa dulce y waffle llevan los mismos toppings. Untables y toppings cuentan igual. */
   const ING_SWEET = [
@@ -102,7 +109,7 @@
     { id: 'champinones', label: 'Champiñones', icon: '🍄', group: 'extra', sub: '+$15' }
   ];
   const SALTY_PRICE = { base: 80, withManchego: 90, extra: 15 };   // jamón + philadelphia $80 · con manchego $90 · extras +$15
-  const DIABLITO_EXTRA = 10;                                         // sabor extra junto a un Diablito
+  let DIABLITO_EXTRA = 10;                                         // sabor extra junto a un Diablito
   const INGREDIENTS = [...ING_SWEET, ...ING_SALTY.filter((s) => !ING_SWEET.some((d) => d.id === s.id))];
 
   /* Sabores del Yuki (un sabor por cucharón servido) */
@@ -490,14 +497,14 @@
   /* Los datos de entrega y pago se arman en la sección 10b */
   let orderDetailsFn = () => ({ intro: '', lines: [], closing: '' });
 
-  function orderMessage() {
+  function orderMessage(code) {
     const lines = cart.map((i) => {
       const unit = i.qty > 1 ? ` (${money(i.price)} c/u)` : '';
       return `• ${i.qty} x ${i.name} — ${money(i.price * i.qty)}${unit}\n${i.lines.map((l) => `   ${l}`).join('\n')}`;
     });
     const notes = cartNotes.value.trim();
     const d = orderDetailsFn();
-    return `¡Hola ${CONFIG.brand}! 🧇 ${d.intro}Quiero hacer este pedido:\n\n${lines.join('\n')}\n\n` +
+    return `¡Hola ${CONFIG.brand}! 🧇 ${d.intro}Quiero hacer este pedido${code ? ` (#${code})` : ''}:\n\n${lines.join('\n')}\n\n` +
       `Subtotal: ${money(cartSubtotal())}\n` +
       `*Total: ${money(cartSubtotal())}*\n\n` +
       d.lines.join('\n') +
@@ -643,8 +650,8 @@
         `</div></fieldset>`;
     } else if (id === 'style') {
       html = `<fieldset class="b-step"><legend>¿Dulce o salada?</legend><div class="opts opts-2">` +
-        optCard('radio', 'style', 'dulce', B.style === 'dulce', '🍫', 'Dulce', 'Desde $80 · Nutella, fresa, cajeta…') +
-        optCard('radio', 'style', 'salada', B.style === 'salada', '🧀', 'Salada', 'Desde $80 · jamón, queso, peperoni…') +
+        optCard('radio', 'style', 'dulce', B.style === 'dulce', '🍫', 'Dulce', `Desde ${money(TYPES.crepa.base)} · Nutella, fresa, cajeta…`) +
+        optCard('radio', 'style', 'salada', B.style === 'salada', '🧀', 'Salada', `Desde ${money(SALTY_PRICE.base)} · jamón, queso, peperoni…`) +
         `</div></fieldset>`;
     } else if (id === 'size') {
       html = `<fieldset class="b-step"><legend>Elige el tamaño</legend><div class="opts opts-${t.sizes.length === 2 ? '2' : '3'}">` +
@@ -811,8 +818,10 @@
 
   /* 2) Abre WhatsApp en una pestaña nueva y luego muestra el aviso final */
   function sendOrder() {
+    const code = genOrderCode();
+    try { saveOrderRemote(code); } catch (_) { /* nunca bloquea el envío */ }
     const a = document.createElement('a');
-    a.href = waUrl(orderMessage());
+    a.href = waUrl(orderMessage(code));
     a.target = '_blank';
     a.rel = 'noopener';
     document.body.appendChild(a);
@@ -947,9 +956,13 @@
   function stallState(s, now) {
     if (s.day !== now.day) return { code: 'other', tone: 'idle', pickup: false, chip: capital(DAY_NAMES[s.day]), text: `Nos vemos el ${DAY_NAMES[s.day]}, de ${timeRange(s)}.` };
     const o = toMin(s.opens), c = toMin(s.closes);
-    if (s.available === false) {
+    const ov = REMOTE.puestos[s.id];
+    const live = ov && ov.date === monterreyDate() ? ov : null;
+    const avail = live && typeof live.available === 'boolean' ? live.available : s.available;
+    const note = (live && live.note) || s.note;
+    if (avail === false) {
       return { code: 'weather', tone: 'closed', pickup: false, chip: 'No instalado hoy',
-        text: s.note || 'Hoy no pudimos instalarnos por el clima o un imprevisto. ¡Gracias por tu comprensión, pronto nos vemos! 💙' };
+        text: note || 'Hoy no pudimos instalarnos por el clima o un imprevisto. ¡Gracias por tu comprensión, pronto nos vemos! 💙' };
     }
     if (now.minutes >= c) return { code: 'done', tone: 'closed', pickup: false, chip: 'Cerrado por hoy', text: 'Hoy ya cerramos este puesto. ¡Gracias por visitarnos! 💙' };
     if (now.minutes < o) return { code: 'later', tone: 'soon', pickup: true, chip: `Abre a las ${fmtTime(o)}`, text: `Hoy abrimos a las ${fmtTime(o)}. ¡Te esperamos!` };
@@ -1418,6 +1431,117 @@
     })();
   }
   initFuture3D();
+
+
+  /* ------------------------------------------------------------------------
+     Conexión con Firebase (solo lectura de config y creación de pedidos, vía REST)
+     ------------------------------------------------------------------------ */
+  function monterreyDate() {
+    try { return new Intl.DateTimeFormat('en-CA', { timeZone: CONFIG.timezone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()); }
+    catch (_) { return new Date().toISOString().slice(0, 10); }
+  }
+  function fsDecode(v) {
+    if (!v || typeof v !== 'object') return null;
+    if ('stringValue' in v) return v.stringValue;
+    if ('integerValue' in v) return Number(v.integerValue);
+    if ('doubleValue' in v) return v.doubleValue;
+    if ('booleanValue' in v) return v.booleanValue;
+    if ('nullValue' in v) return null;
+    if ('mapValue' in v) { const o = {}; Object.entries(v.mapValue.fields || {}).forEach(([k, x]) => { o[k] = fsDecode(x); }); return o; }
+    if ('arrayValue' in v) return (v.arrayValue.values || []).map(fsDecode);
+    return null;
+  }
+  function fsEncode(v) {
+    if (v === null || v === undefined) return { nullValue: null };
+    if (typeof v === 'string') return { stringValue: v };
+    if (typeof v === 'boolean') return { booleanValue: v };
+    if (typeof v === 'number') return Number.isInteger(v) ? { integerValue: String(v) } : { doubleValue: v };
+    if (Array.isArray(v)) return { arrayValue: { values: v.map(fsEncode) } };
+    const fields = {}; Object.entries(v).forEach(([k, x]) => { fields[k] = fsEncode(x); });
+    return { mapValue: { fields } };
+  }
+
+  function applyPrices(p) {
+    const g = (k) => { const n = Number(p && p[k]); return Number.isFinite(n) && n >= 0 && n <= 9999 ? n : PRICE_DEFAULTS[k]; };
+    TYPES.crepa.base = g('crepa_base');
+    TYPES.waffle.base = g('waffle_base');
+    EXTRA = g('extra_topping');
+    DIABLITO_EXTRA = g('diablito_extra');
+    SALTY_PRICE.base = g('salada_base');
+    SALTY_PRICE.withManchego = g('salada_manchego');
+    SALTY_PRICE.extra = g('salada_extra');
+    TYPES.fresas.sizes.forEach((z) => { z.base = g('fresas_' + z.id); });
+    TYPES.yuki.sizes.forEach((z) => { z.price = g('yuki_' + z.id); });
+    ING_SALTY.forEach((i) => {
+      if (i.id === 'manchego') i.sub = `Con manchego: ${money(SALTY_PRICE.withManchego)}`;
+      if (['peperoni', 'pina-salada', 'champinones'].includes(i.id)) i.sub = `+${money(SALTY_PRICE.extra)}`;
+    });
+    cart = cart.map((i) => makeItem(i.spec, i.qty));
+    renderCart();
+    renderPromos();
+    try { renderPanel(); } catch (_) { /* ignore */ }
+  }
+
+  function showNotice(n) {
+    const el = $('#site-notice');
+    if (!el) return;
+    const on = n && n.active && String(n.text || '').trim();
+    el.hidden = !on;
+    if (on) el.textContent = String(n.text).trim().slice(0, 240);
+  }
+
+  let lastRemote = '';
+  function loadRemote() {
+    fetch(`${FS_BASE}/config/site?key=${FB.key}`, { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((doc) => {
+        if (!doc || !doc.fields) return;
+        const cfg = fsDecode({ mapValue: { fields: doc.fields } }) || {};
+        const sig = JSON.stringify(cfg) + monterreyDate();
+        if (sig === lastRemote) return;
+        lastRemote = sig;
+        REMOTE.notice = cfg.notice || null;
+        REMOTE.puestos = cfg.puestos && typeof cfg.puestos === 'object' ? cfg.puestos : {};
+        showNotice(REMOTE.notice);
+        applyPrices(cfg.prices || {});
+        renderPuestos();
+        renderCheckout();
+      })
+      .catch(() => { /* sin conexión: se queda con lo que ya hay */ });
+  }
+
+  function genOrderCode() {
+    const a = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+    let c = 'YK';
+    for (let i = 0; i < 4; i++) c += a[Math.floor(Math.random() * a.length)];
+    return c;
+  }
+
+  function saveOrderRemote(code) {
+    const d = orderDetailsFn();
+    const delivery = CO.mode === 'delivery';
+    const o = {
+      code, createdAt: Date.now(), date: monterreyDate(),
+      name: coName.value.trim().slice(0, 60),
+      mode: delivery ? 'delivery' : 'pickup',
+      placeId: delivery ? '' : CO.place,
+      place: delivery ? '' : placeText().slice(0, 120),
+      address: delivery ? coAddress.value.trim().slice(0, 300) : '',
+      pay: CO.pay || '',
+      items: cart.map((i) => ({ name: i.name, qty: i.qty, price: i.price, lines: i.lines.slice(0, 30) })),
+      subtotal: cartSubtotal(), total: cartSubtotal(),
+      notes: cartNotes.value.trim().slice(0, 500),
+      status: 'nuevo', source: 'web'
+    };
+    fetch(`${FS_BASE}/orders?documentId=${encodeURIComponent(code)}&key=${FB.key}`, {
+      method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fields: fsEncode(o).mapValue.fields })
+    }).catch(() => {});
+  }
+
+  loadRemote();
+  setInterval(loadRemote, 60000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) loadRemote(); });
 
   /* ------------------------------------------------------------------------
      Arranque

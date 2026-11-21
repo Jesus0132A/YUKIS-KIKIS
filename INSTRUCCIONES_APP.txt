@@ -1,0 +1,33 @@
+APP DE ADMINISTRACION YUKIS KIKIS (Etapa 1)
+===========================================
+
+PASO 1 - Firebase (consola de Firebase, proyecto "yukis-kikis")
+  a) Build > Firestore Database > "Crear base de datos" (modo producción, región us-east1 o la más cercana).
+     (Es distinta de "Realtime Database": necesitamos Firestore.)
+  b) Build > Authentication > "Comenzar" > Método de acceso > Correo electrónico/contraseña > Habilitar.
+  c) Authentication > Usuarios > "Agregar usuario": correo angelpalomino72.ap@gmail.com + una contraseña tuya.
+     (Authentication > Configuración > "Acciones del usuario": desactiva "Permitir que los usuarios se registren".)
+  d) Firestore > pestaña "Reglas": borra todo, pega el contenido de firestore.rules y pulsa "Publicar".
+  e) Authentication > Configuración > Dominios autorizados: agrega tu dominio de GitHub Pages
+     (ej. TUUSUARIO.github.io).
+
+PASO 2 - Subir archivos a GitHub (mismo repositorio de la página)
+  - Reemplaza: index.html, styles.css, app.js
+  - Sube la carpeta nueva completa: admin/  (index.html, admin.js, admin.css, sw.js, manifest.webmanifest, iconos)
+  - puestos.js se queda igual (el panel lo usa para la lista de puestos).
+  - firestore.rules no hace falta subirlo (solo pegarlo en Firebase).
+
+PASO 3 - Instalar la app en el celular
+  - Abre en el celular: https://TUUSUARIO.github.io/TU-REPO/admin/
+  - Android (Chrome): menú ⋮ > "Instalar app" / "Agregar a pantalla de inicio".
+  - iPhone (Safari): botón Compartir > "Agregar a pantalla de inicio".
+  - Entra con tu correo y contraseña.
+
+QUE HACE
+  Pedidos: llegan en vivo (sonido + aviso), estados Nuevo/Preparando/Listo/Entregado, editar productos y
+           cantidades, envío/ajuste, pagado, notas internas, cancelar con motivo.
+  Puestos: botón Abierto / Cerrado hoy (con mensaje opcional). Se refleja en la página y se reinicia solo mañana.
+  Precios: cambia cualquier precio; la página lo toma en menos de 1 minuto.
+  Más:     aviso en barra amarilla de la página, sonido, ver página, cerrar sesión.
+
+NOTA: los pedidos de la página siguen yendo a WhatsApp; ahora además se guardan en el panel con un código (#YKXXXX).
