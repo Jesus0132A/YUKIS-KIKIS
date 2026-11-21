@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Yukis Kikis · Crepas, Waffles y Yukis en Monterrey</title>
-  <meta name="description" content="Yukis Kikis, Monterrey N.L.: crepas gourmet, waffles belgas, fresas con crema y Yukis. Arma tu antojo, agrega al carrito y pídelo por WhatsApp. Martes a Domingo de 3:00 PM a 10:30 PM." />
+  <meta name="description" content="Yukis Kikis, Monterrey N.L.: crepas gourmet, waffles belgas, fresas con crema y Yukis. Arma tu antojo, agrega al carrito y pídelo por WhatsApp. Martes a Domingo de 6:00 PM a 10:30 PM." />
   <meta name="theme-color" content="#0038E2" />
   <link rel="icon" href="./logo_nuevo_icono.png" type="image/png" />
 
@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./styles.css?v=15" />
 </head>
 <body>
 
@@ -32,6 +32,7 @@
         <a href="#personaliza" data-spy="personaliza">Arma tu Antojo</a>
         <a href="#marca" data-spy="marca">Nuestra Marca</a>
         <a href="#horario" data-spy="horario">Horario</a>
+        <a href="#puestos" data-spy="puestos">Puestos</a>
         <a href="#ubicacion" data-spy="ubicacion">Ubicación</a>
         <a class="nav-cta-mobile" href="#" data-wa="¡Hola Yukis Kikis! Quiero hacer un pedido 🧇">
           <i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Pedir por WhatsApp
@@ -183,15 +184,29 @@
             <h2>Horario de atención</h2>
             <ul class="hours-list" id="hours-list">
               <li data-day="1"><span>Lunes</span><b class="closed">Cerrado</b></li>
-              <li data-day="2"><span>Martes</span><b>3:00 PM – 10:30 PM</b></li>
-              <li data-day="3"><span>Miércoles</span><b>3:00 PM – 10:30 PM</b></li>
-              <li data-day="4"><span>Jueves</span><b>3:00 PM – 10:30 PM</b></li>
-              <li data-day="5"><span>Viernes</span><b>3:00 PM – 10:30 PM</b></li>
-              <li data-day="6"><span>Sábado</span><b>3:00 PM – 10:30 PM</b></li>
-              <li data-day="0"><span>Domingo</span><b>3:00 PM – 10:30 PM</b></li>
+              <li data-day="2"><span>Martes</span><b>6:00 PM – 10:30 PM</b></li>
+              <li data-day="3"><span>Miércoles</span><b>6:00 PM – 10:30 PM</b></li>
+              <li data-day="4"><span>Jueves</span><b>6:00 PM – 10:30 PM</b></li>
+              <li data-day="5"><span>Viernes</span><b>6:00 PM – 10:30 PM</b></li>
+              <li data-day="6"><span>Sábado</span><b>6:00 PM – 10:30 PM</b></li>
+              <li data-day="0"><span>Domingo</span><b>6:00 PM – 10:30 PM</b></li>
             </ul>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- ============ PUESTOS EN EL MERCADO (se editan en puestos.js) ============ -->
+    <section class="section" id="puestos">
+      <div class="wrap">
+        <header class="section-head" data-reveal>
+          <span class="pill pill-blue">Puestos en el mercado</span>
+          <h2>Encuéntranos <span class="u-red">en el mercado</span></h2>
+          <p>Cada día estamos en un lugar distinto. Aquí te decimos dónde, y si el puesto ya está abierto.</p>
+        </header>
+        <div class="puestos-today" id="puestos-today" aria-live="polite"></div>
+        <div class="puestos-grid" id="puestos-grid"></div>
+        <p class="puestos-foot">Si el clima o algún imprevisto nos impide instalarnos, lo avisamos aquí mismo. ¡Gracias por tu comprensión! 💙</p>
       </div>
     </section>
 
@@ -247,13 +262,14 @@
         <a href="#personaliza">Arma tu Antojo</a>
         <a href="#marca">Nuestra Marca</a>
         <a href="#horario">Horario</a>
+        <a href="#puestos">Puestos</a>
         <a href="#ubicacion">Ubicación</a>
       </nav>
 
       <div class="footer-status">
         <h3>Hoy</h3>
         <span class="live-pill live-pill-dark" id="footer-live" data-state="loading"><i class="live-dot" aria-hidden="true"></i><span id="footer-live-text">Revisando horario…</span></span>
-        <p>Martes a Domingo<br />3:00 PM – 10:30 PM</p>
+        <p>Martes a Domingo<br />6:00 PM – 10:30 PM</p>
       </div>
     </div>
     <div class="wrap footer-bottom">
@@ -272,22 +288,51 @@
     <div class="cart-body">
       <ul class="cart-list" id="cart-list"></ul>
       <p class="cart-empty" id="cart-empty">Tu carrito está vacío. ¡Agrega algo rico del menú! 🧇</p>
+
+      <!-- Datos del pedido: entrega y forma de pago (se dibujan con app.js) -->
+      <div class="checkout" id="checkout" hidden>
+        <h3 class="co-title">Datos de tu pedido</h3>
+        <label class="co-field">
+          <span>Tu nombre</span>
+          <input id="co-name" type="text" autocomplete="name" maxlength="60" placeholder="Ej. Ana" />
+        </label>
+        <fieldset class="co-group">
+          <legend>¿Cómo lo quieres?</legend>
+          <div class="co-pills" id="co-mode"></div>
+        </fieldset>
+        <fieldset class="co-group" id="co-pickup-wrap" hidden>
+          <legend>¿Dónde lo recoges?</legend>
+          <div class="co-list" id="co-pickup"></div>
+        </fieldset>
+        <label class="co-field" id="co-address-wrap" hidden>
+          <span>Dirección de entrega y referencias</span>
+          <textarea id="co-address" rows="2" maxlength="220" placeholder="Calle, número, colonia y referencias…"></textarea>
+        </label>
+        <fieldset class="co-group">
+          <legend>¿Cómo vas a pagar?</legend>
+          <div class="co-pills" id="co-pay"></div>
+          <div class="co-hint" id="co-pay-hint"></div>
+        </fieldset>
+        <label class="cart-notes">
+                <span>Notas para tu pedido <small>(opcional)</small></span>
+                <textarea id="cart-notes" rows="2" maxlength="200" placeholder="Ej. sin nuez, entregar en la caseta…"></textarea>
+              </label>
+        <p class="cart-ship" id="cart-ship"><i class="fa-solid fa-motorcycle" aria-hidden="true"></i> Envío a domicilio: <b>se cobra por separado</b>.</p>
+        <p class="co-error" id="co-error" role="alert" hidden></p>
+      </div>
     </div>
 
     <footer class="cart-foot" id="cart-foot">
-      <p class="cart-ship"><i class="fa-solid fa-motorcycle" aria-hidden="true"></i> Envío a domicilio: <b>se cobra por separado</b>.</p>
       <dl class="cart-totals">
         <div><dt>Subtotal</dt><dd id="cart-subtotal">$0</dd></div>
         <div class="cart-total"><dt>Total</dt><dd id="cart-total">$0</dd></div>
       </dl>
-      <label class="cart-notes">
-        <span>Notas para tu pedido <small>(opcional)</small></span>
-        <textarea id="cart-notes" rows="2" maxlength="200" placeholder="Ej. sin nuez, entregar en la caseta…"></textarea>
-      </label>
       <div class="cart-actions">
         <button type="button" class="btn btn-wa btn-block" id="cart-wa"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Enviar pedido por WhatsApp</button>
-        <button type="button" class="btn btn-yellow btn-block" id="cart-more" data-add-more><i class="fa-solid fa-plus" aria-hidden="true"></i> Agregar otra cosa</button>
-        <button type="button" class="btn btn-ghost-dark btn-block" id="cart-clear">Vaciar carrito</button>
+        <div class="cart-actions-row">
+          <button type="button" class="btn btn-yellow" id="cart-more" data-add-more><i class="fa-solid fa-plus" aria-hidden="true"></i> Agregar otra cosa</button>
+          <button type="button" class="btn btn-ghost-dark" id="cart-clear">Vaciar</button>
+        </div>
       </div>
     </footer>
   </aside>
@@ -338,6 +383,7 @@
   <!-- GSAP + ScrollTrigger -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script src="./app.js"></script>
+  <script src="./puestos.js?v=15"></script>
+  <script src="./app.js?v=15"></script>
 </body>
 </html>

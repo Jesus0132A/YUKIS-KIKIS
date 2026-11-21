@@ -17,10 +17,16 @@
     brand: 'Yukis Kikis',
     whatsapp: '528125815389',            // +52 812 581 5389
     timezone: 'America/Monterrey',
-    openMinutes: 15 * 60,                // 3:00 PM
+    openMinutes: 18 * 60,                // 6:00 PM
     closeMinutes: 22 * 60 + 30,          // 10:30 PM
     closedDay: 1,                        // 0 = Domingo … 1 = Lunes (día de descanso)
     maps: 'https://maps.app.goo.gl/zuhFiZuH5n8V4cHaA',
+    localLabel: 'Nuestro local (Av. de los Astros 1305)',
+    /* Formas de pago. La tarjeta se cobra con terminal (en el local/puesto o llevándola a domicilio).
+       Para transferencia, llena tus datos; si los dejas vacíos, se los mandas por WhatsApp al cliente. */
+    payments: {
+      transfer: { bank: '', holder: '', clabe: '' }
+    },
     /* Para mostrar el MAPA con la dirección, llena UNA de estas dos:
        address  → la dirección escrita, ej. 'Av. Ejemplo 123, Col. Centro, Monterrey, N.L.'
        mapEmbed → el enlace del iframe de Google Maps (Compartir → Insertar un mapa → copia solo lo que va en src="...") */
@@ -41,6 +47,7 @@
     video: {
       scrub: 0.5,                        // suavizado de GSAP ScrollTrigger (0.5 – 1)
       smoothing: 0.18,                   // suavizado de respaldo si GSAP no cargó
+      version: '14',                     // sube este número cuando cambies un video, para que los celulares no usen la copia vieja guardada
       loadTimeout: 9000,                 // ms de espera por video antes de probar el siguiente
       maxRetries: 3                      // reintentos automáticos si el video se pierde
     }
@@ -125,8 +132,8 @@
      · kind 'sized'   → igual, pero el tamaño define base e ingredientes incluidos (fresas con crema).
      · kind 'flavors' → el tamaño define el precio y cuántos sabores caben (yuki). */
   const TYPES = {
-    crepa: { label: 'Crepa', icon: '🥞', kind: 'ing', base: 80, included: 2, styles: true, steps: ['type', 'style', 'ing', 'review'] },
-    waffle: { label: 'Waffle de Chocolate', icon: '🧇', kind: 'ing', base: 80, included: 2, steps: ['type', 'ing', 'review'] },
+    crepa: { label: 'Crepa', icon: '🥞', kind: 'ing', base: 80, included: 2, styles: ['dulce', 'salada'], steps: ['type', 'style', 'ing', 'review'] },
+    waffle: { label: 'Waffle', icon: '🧇', kind: 'ing', base: 80, included: 2, styles: ['normal', 'chocolate'], steps: ['type', 'style', 'ing', 'review'] },
     fresas: {
       label: 'Fresas con Crema', icon: '🍓', kind: 'sized', steps: ['type', 'size', 'ing', 'review'],
       sizes: [
@@ -159,7 +166,7 @@
     { id: 'crepa', title: 'Crepa', emoji: '🥞', photos: [{ src: './menu-crepa.jpg' }, { src: './crepa.png' }],
       quick: { type: 'crepa', style: 'dulce', ingredients: ['nutella', 'fresa'] } },
     { id: 'waffle', title: 'Waffle', emoji: '🧇', photos: [{ src: './menu-waffle.jpg' }, { src: './wafle.png' }],
-      quick: { type: 'waffle', ingredients: ['nutella', 'fresa'] } },
+      quick: { type: 'waffle', style: 'normal', ingredients: ['nutella', 'fresa'] } },
     { id: 'fresas', title: 'Fresas con Crema', emoji: '🍓', photos: [{ src: './menu-fresas.jpg' }, { src: './fresas con crema.png', fit: 'contain' }],
       quick: { type: 'fresas', size: 'chica', ingredients: ['lechera'] } },
     { id: 'yuki', title: 'Yuki', emoji: '🍧', photos: [{ src: './menu-yuki.jpg' }, { src: './yuki limon.png', fit: 'contain' }],
@@ -174,7 +181,7 @@
     { id: 'promo-crepa', name: 'Crepa Classic', emoji: '🥞', photos: POSTER.crepa.map((src) => ({ src })),
       spec: { type: 'crepa', style: 'dulce', ingredients: ['nutella', 'fresa'] } },
     { id: 'promo-waffle', name: 'Waffle de Chocolate', emoji: '🧇', photos: POSTER.waffle.map((src) => ({ src })),
-      spec: { type: 'waffle', ingredients: ['nutella', 'fresa', 'lechera'] } },
+      spec: { type: 'waffle', style: 'chocolate', ingredients: ['nutella', 'fresa', 'lechera'] } },
     { id: 'promo-jumbo', name: 'Fresas Jumbo', emoji: '🍓', photos: POSTER.fresas.map((src) => ({ src })),
       spec: { type: 'fresas', size: 'jumbo', ingredients: ['lechera', 'nuez'] } }
   ];
@@ -226,7 +233,7 @@
   const normalizeSpec = (spec) => {
     const t = TYPES[spec.type];
     const out = { type: spec.type, style: null, size: null, ingredients: [], flavors: [] };
-    if (t.styles) out.style = spec.style === 'salada' ? 'salada' : 'dulce';
+    if (t.styles) out.style = t.styles.includes(spec.style) ? spec.style : t.styles[0];
     if (t.sizes) out.size = byId(t.sizes, spec.size) ? spec.size : t.sizes[0].id;
     if (t.kind === 'ing' || t.kind === 'sized') {
       out.ingredients = ingList(out).map((i) => i.id).filter((id) => (spec.ingredients || []).includes(id));
@@ -281,6 +288,7 @@
       const ing = spec.ingredients;                      // Crepa Classic = solo Nutella + Fresa; con otros toppings es "Crepa"
       return ing.length === 2 && ing.includes('nutella') && ing.includes('fresa') ? 'Crepa Classic' : 'Crepa';
     }
+    if (spec.type === 'waffle') return spec.style === 'chocolate' ? 'Waffle de Chocolate' : 'Waffle';
     const sz = t.sizes ? byId(t.sizes, spec.size) : null;
     return sz ? `${t.label} ${sz.label}` : t.label;
   };
@@ -296,7 +304,10 @@
     const t = TYPES[type];
     if (t.kind === 'flavors') return { type, size: t.sizes[0].id, ingredients: [], flavors: ['limon'] };
     if (t.kind === 'sized') return { type, size: t.sizes[0].id, ingredients: ['lechera'], flavors: [] };
-    if (t.styles) return { type, style: style || 'dulce', ingredients: style === 'salada' ? ['jamon', 'philadelphia'] : ['nutella', 'fresa'], flavors: [] };
+    if (t.styles) {
+      const st = t.styles.includes(style) ? style : t.styles[0];
+      return { type, style: st, ingredients: st === 'salada' ? ['jamon', 'philadelphia'] : ['nutella', 'fresa'], flavors: [] };
+    }
     return { type, size: null, ingredients: ['nutella', 'fresa'], flavors: [] };
   }
   const minPrice = (type) => {
@@ -321,7 +332,7 @@
 
   /* Scroll ligero: se guardan las posiciones de las secciones y solo se escribe lo que cambia */
   const progressBar = $('#scroll-progress');
-  const spyIds = ['inicio', 'menu', 'personaliza', 'marca', 'horario', 'ubicacion'];
+  const spyIds = ['inicio', 'menu', 'personaliza', 'marca', 'horario', 'puestos', 'ubicacion'];
   const spyLinks = $$('[data-spy]');
   let spyTops = [];
   let docMax = 1;
@@ -476,19 +487,25 @@
   const cartUnits = () => cart.reduce((n, i) => n + i.qty, 0);
   const cartSubtotal = () => cart.reduce((n, i) => n + i.price * i.qty, 0);
 
+  /* Los datos de entrega y pago se arman en la sección 10b */
+  let orderDetailsFn = () => ({ intro: '', lines: [], closing: '' });
+
   function orderMessage() {
     const lines = cart.map((i) => {
       const unit = i.qty > 1 ? ` (${money(i.price)} c/u)` : '';
       return `• ${i.qty} x ${i.name} — ${money(i.price * i.qty)}${unit}\n${i.lines.map((l) => `   ${l}`).join('\n')}`;
     });
     const notes = cartNotes.value.trim();
-    return `¡Hola ${CONFIG.brand}! 🧇 Quiero hacer este pedido:\n\n${lines.join('\n')}\n\n` +
+    const d = orderDetailsFn();
+    return `¡Hola ${CONFIG.brand}! 🧇 ${d.intro}Quiero hacer este pedido:\n\n${lines.join('\n')}\n\n` +
       `Subtotal: ${money(cartSubtotal())}\n` +
-      `*Total: ${money(cartSubtotal())}*` +
-      `\n(Si pido envío a domicilio, se cobra por separado.)` +
+      `*Total: ${money(cartSubtotal())}*\n\n` +
+      d.lines.join('\n') +
       (notes ? `\n\nNotas: ${notes}` : '') +
-      `\n\n¿Me confirman tiempo de entrega? ¡Gracias!`;
+      `\n\n${d.closing}`;
   }
+
+  let onCartRender = () => {};                     // lo asigna la sección 10b (datos de entrega y pago)
 
   function renderCart() {
     const units = cartUnits();
@@ -522,6 +539,7 @@
     $('#cart-subtotal').textContent = money(cartSubtotal());
     $('#cart-total').textContent = money(cartSubtotal());
     $('#cart-wa').disabled = empty;
+    onCartRender();
   }
 
   function addToCart(spec, qty = 1, silent = false) {
@@ -617,6 +635,11 @@
     if (id === 'type') {
       html = `<fieldset class="b-step"><legend>¿Qué se te antoja?</legend><div class="opts opts-4">` +
         Object.entries(TYPES).map(([k, v]) => optCard('radio', 'type', k, B.type === k, v.icon, v.label, `Desde ${money(minPrice(k))}`)).join('') +
+        `</div></fieldset>`;
+    } else if (id === 'style' && B.type === 'waffle') {
+      html = `<fieldset class="b-step"><legend>¿Normal o de chocolate?</legend><div class="opts opts-2">` +
+        optCard('radio', 'style', 'normal', B.style === 'normal', '🧇', 'Normal', 'Waffle clásico · desde $80') +
+        optCard('radio', 'style', 'chocolate', B.style === 'chocolate', '🍫', 'De chocolate', 'Waffle de chocolate · desde $80') +
         `</div></fieldset>`;
     } else if (id === 'style') {
       html = `<fieldset class="b-step"><legend>¿Dulce o salada?</legend><div class="opts opts-2">` +
@@ -781,7 +804,8 @@
   /* 1) Antes de mandar: ¿quiere añadir otra cosa? */
   function askBeforeSend() {
     if (!cart.length) { toast('Agrega algo a tu pedido primero 🧇'); return; }
-    $('#ask-summary').textContent = `${cartUnits()} artículo${cartUnits() === 1 ? '' : 's'} · Total ${money(cartSubtotal())}`;
+    if (!validateOrder()) return;                    // falta nombre, entrega o pago
+    $('#ask-summary').textContent = `${cartUnits()} artículo${cartUnits() === 1 ? '' : 's'} · Total ${money(cartSubtotal())} · ${orderDetailsFn().short}`;
     showModal(askModal, '#ask-send');
   }
 
@@ -835,6 +859,7 @@
       cart = [];
       cartNotes.value = '';
       store.set(NOTES_KEY, '');
+      resetCheckout();
       saveCart();
       renderCart();
       resetBuilder();
@@ -909,6 +934,210 @@
   }
   updateLiveStatus();
   setInterval(updateLiveStatus, 60000);
+
+  /* ------------------------------------------------------------------------
+     10b · PUESTOS EN EL MERCADO + ENTREGA Y PAGO
+     Los puestos se editan en puestos.js (available: false = hoy no estamos).
+     ------------------------------------------------------------------------ */
+  const PUESTOS = Array.isArray(window.YK_PUESTOS) ? window.YK_PUESTOS : [];
+  const toMin = (s) => { const [h, m] = String(s).split(':').map(Number); return h * 60 + (m || 0); };
+  const capital = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const timeRange = (s) => `${fmtTime(toMin(s.opens))} – ${fmtTime(toMin(s.closes))}`;
+
+  function stallState(s, now) {
+    if (s.day !== now.day) return { code: 'other', tone: 'idle', pickup: false, chip: capital(DAY_NAMES[s.day]), text: `Nos vemos el ${DAY_NAMES[s.day]}, de ${timeRange(s)}.` };
+    const o = toMin(s.opens), c = toMin(s.closes);
+    if (s.available === false) {
+      return { code: 'weather', tone: 'closed', pickup: false, chip: 'No instalado hoy',
+        text: s.note || 'Hoy no pudimos instalarnos por el clima o un imprevisto. ¡Gracias por tu comprensión, pronto nos vemos! 💙' };
+    }
+    if (now.minutes >= c) return { code: 'done', tone: 'closed', pickup: false, chip: 'Cerrado por hoy', text: 'Hoy ya cerramos este puesto. ¡Gracias por visitarnos! 💙' };
+    if (now.minutes < o) return { code: 'later', tone: 'soon', pickup: true, chip: `Abre a las ${fmtTime(o)}`, text: `Hoy abrimos a las ${fmtTime(o)}. ¡Te esperamos!` };
+    return { code: 'open', tone: 'open', pickup: true, chip: 'Abierto ahora', text: '¡Ya estamos instalados y abiertos! Ven por tu antojo.' };
+  }
+
+  function localState(now) {
+    const open = now.day !== CONFIG.closedDay && now.minutes >= CONFIG.openMinutes && now.minutes < CONFIG.closeMinutes;
+    return { open, text: open ? 'Abierto ahora' : `Cerrado ahora · abrimos ${nextOpening(now)}` };
+  }
+
+  function renderPuestos() {
+    const grid = $('#puestos-grid');
+    if (!grid) return;
+    const now = monterreyNow();
+
+    /* Aviso de hoy */
+    const today = PUESTOS.map((s) => ({ s, st: stallState(s, now) })).filter((x) => x.s.day === now.day);
+    const open = today.filter((x) => x.st.code === 'open');
+    const later = today.filter((x) => x.st.code === 'later');
+    const loc = localState(now);
+    let tone = 'idle', msg;
+    if (!today.length) {
+      msg = `Hoy no tenemos puesto en el mercado. ${loc.open ? '¡Pero nuestro local sí está abierto!' : 'Revisa nuestro horario para visitarnos en el local.'}`;
+    } else if (open.length) {
+      tone = 'open';
+      msg = `¡Hoy ya estamos instalados y abiertos! Búscanos en: ${open.map((x) => `${x.s.market} (${x.s.name.toLowerCase()})`).join(', ')}.`;
+    } else if (later.length) {
+      tone = 'soon';
+      msg = `Hoy nos instalamos en ${later[0].s.market}. Abrimos a las ${fmtTime(toMin(later[0].s.opens))}. ¡Te esperamos!`;
+    } else {
+      tone = 'closed';
+      msg = 'Por el momento nuestro puesto del mercado no está abierto. ¡Gracias por tu comprensión! Te esperamos en el local o en nuestro próximo puesto.';
+    }
+    $('#puestos-today').innerHTML = `<p class="today-banner tone-${tone}"><span class="today-dot" aria-hidden="true"></span>${esc(msg)}</p>`;
+
+    /* Tarjetas por día y mercado, empezando por hoy */
+    const order = [0, 1, 2, 3, 4, 5, 6].map((k) => (now.day + k) % 7);
+    const groups = [];
+    order.forEach((d, idx) => {
+      const byMarket = new Map();
+      PUESTOS.filter((s) => s.day === d).forEach((s) => { if (!byMarket.has(s.market)) byMarket.set(s.market, []); byMarket.get(s.market).push(s); });
+      byMarket.forEach((stalls, market) => groups.push({ d, idx, market, stalls }));
+    });
+    grid.innerHTML = groups.map((g) => {
+      const label = g.idx === 0 ? `Hoy · ${capital(DAY_NAMES[g.d])}` : g.idx === 1 ? `Mañana · ${capital(DAY_NAMES[g.d])}` : capital(DAY_NAMES[g.d]);
+      const items = g.stalls.map((s) => {
+        const st = stallState(s, now);
+        const showMsg = g.idx === 0 || st.code === 'other';
+        return `<li class="puesto tone-${st.tone}">
+          <div class="puesto-top"><b>${esc(s.name)}</b><span class="st-chip tone-${st.tone}">${g.idx === 0 ? esc(st.chip) : 'Próximamente'}</span></div>
+          <p class="puesto-line"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> ${esc(s.where)}</p>
+          <p class="puesto-line"><i class="fa-regular fa-clock" aria-hidden="true"></i> ${esc(timeRange(s))}</p>
+          ${showMsg && g.idx === 0 ? `<p class="puesto-msg">${esc(st.text)}</p>` : ''}
+          ${s.maps ? `<a class="puesto-map" href="${esc(s.maps)}" target="_blank" rel="noopener">Cómo llegar <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>` : ''}
+        </li>`;
+      }).join('');
+      return `<article class="puesto-card${g.idx === 0 ? ' is-today' : ''}"><header><span class="puesto-day">${esc(label)}</span><h3>${esc(g.market)}</h3></header><ul class="puesto-list">${items}</ul></article>`;
+    }).join('') || '<p class="puestos-empty">Pronto te compartimos dónde encontrarnos. ¡Síguenos en redes!</p>';
+  }
+
+  /* ---- Entrega y pago (dentro del carrito) ---- */
+  const CO = { mode: '', place: '', pay: '' };
+  const NAME_KEY = 'yukiskikis_name_v1';
+  const ADDR_KEY = 'yukiskikis_addr_v1';
+  const coName = $('#co-name');
+  const coAddress = $('#co-address');
+  const PAYS = [{ id: 'cash', label: 'Efectivo', icon: '💵' }, { id: 'card', label: 'Tarjeta', icon: '💳' }, { id: 'transfer', label: 'Transferencia', icon: '🏦' }];
+  coName.value = store.get(NAME_KEY) || '';
+  coAddress.value = store.get(ADDR_KEY) || '';
+
+  function pickupOptions(now) {
+    const loc = localState(now);
+    const opts = [{ id: 'local', label: CONFIG.localLabel, ok: true, tone: loc.open ? 'open' : 'idle', status: loc.text }];
+    PUESTOS.filter((s) => s.day === now.day).forEach((s) => {
+      const st = stallState(s, now);
+      opts.push({ id: s.id, label: `Puesto ${s.market} · ${s.name}`, ok: st.pickup, tone: st.tone, status: st.pickup ? st.chip : st.chip });
+    });
+    return opts;
+  }
+
+  const pill = (name, value, checked, icon, label, extra = '') =>
+    `<label class="co-pill${extra}"><input type="radio" name="${name}" value="${value}"${checked ? ' checked' : ''} /><span><i aria-hidden="true">${icon}</i>${esc(label)}</span></label>`;
+
+  function payHint() {
+    if (!CO.pay) return 'Elige cómo prefieres pagar.';
+    const d = CO.mode === 'delivery';
+    if (CO.pay === 'cash') return d ? '💵 Pagas en efectivo cuando recibas tu pedido. Si necesitas cambio, avísanos en las notas.' : '💵 Pagas en efectivo al recoger tu pedido.';
+    if (CO.pay === 'card') return d ? '💳 Te llevamos la terminal a domicilio para que pagues con tarjeta.' : '💳 Pagas con tarjeta en nuestra terminal al recoger tu pedido.';
+    const t = CONFIG.payments.transfer;
+    if (t.clabe) {
+      return `🏦 <b>Transferencia</b><br>${t.bank ? `Banco: ${esc(t.bank)}<br>` : ''}${t.holder ? `A nombre de: ${esc(t.holder)}<br>` : ''}CLABE: <b>${esc(t.clabe)}</b> ` +
+        `<button type="button" class="co-copy" data-copy="${esc(t.clabe)}">Copiar</button><br>Envía tu comprobante por WhatsApp para confirmar tu pedido.`;
+    }
+    return '🏦 Te enviamos los datos de la cuenta por WhatsApp. Cuando transfieras, manda tu comprobante para confirmar tu pedido.';
+  }
+
+  function renderCheckout() {
+    const box = $('#checkout');
+    box.hidden = cart.length === 0;
+    if (box.hidden) return;
+    const now = monterreyNow();
+    const opts = pickupOptions(now);
+    let lost = false;
+    if (CO.place && !opts.some((o) => o.id === CO.place && o.ok)) { CO.place = ''; lost = true; }
+
+    const ae = document.activeElement;
+    const keep = ae && ae.matches && ae.matches('#checkout input[type="radio"]') ? { n: ae.name, v: ae.value } : null;
+
+    $('#co-mode').innerHTML = pill('co-mode', 'pickup', CO.mode === 'pickup', '🛍️', 'Paso por él') + pill('co-mode', 'delivery', CO.mode === 'delivery', '🛵', 'A domicilio');
+    $('#co-pickup-wrap').hidden = CO.mode !== 'pickup';
+    $('#co-pickup').innerHTML = opts.map((o) =>
+      `<label class="co-place tone-${o.tone}${o.ok ? '' : ' is-off'}"><input type="radio" name="co-place" value="${esc(o.id)}"${CO.place === o.id ? ' checked' : ''}${o.ok ? '' : ' disabled'} />` +
+      `<span><b>${esc(o.label)}</b><small>${esc(o.status)}</small></span></label>`).join('') +
+      (lost ? '<p class="co-lost">El lugar que elegiste ya no está disponible. Elige otro, por favor 🙏</p>' : '');
+    $('#co-address-wrap').hidden = CO.mode !== 'delivery';
+    $('#co-pay').innerHTML = PAYS.map((p) => pill('co-pay', p.id, CO.pay === p.id, p.icon, p.label)).join('');
+    $('#co-pay-hint').innerHTML = payHint();
+    $('#cart-ship').innerHTML = CO.mode === 'delivery'
+      ? '<i class="fa-solid fa-motorcycle" aria-hidden="true"></i> A domicilio: <b>el envío se cobra por separado</b>; te confirmamos el costo por WhatsApp.'
+      : '<i class="fa-solid fa-motorcycle" aria-hidden="true"></i> Envío a domicilio: <b>se cobra por separado</b>.';
+    if (keep) { const el = $(`#checkout input[name="${keep.n}"][value="${keep.v}"]`); if (el && !el.disabled) el.focus({ preventScroll: true }); }
+  }
+
+  function showCoError(msg, sel) {
+    const err = $('#co-error');
+    err.textContent = msg;
+    err.hidden = false;
+    const target = $(sel);
+    if (target) { target.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'center' }); const f = target.matches('input,textarea') ? target : $('input', target); if (f) f.focus({ preventScroll: true }); }
+    return false;
+  }
+  function validateOrder() {
+    $('#co-error').hidden = true;
+    if (!coName.value.trim()) return showCoError('Escribe tu nombre para tu pedido 🙂', '#co-name');
+    if (!CO.mode) return showCoError('Elige si pasas por tu pedido o lo quieres a domicilio.', '#co-mode');
+    if (CO.mode === 'pickup' && !CO.place) return showCoError('Elige dónde vas a recoger tu pedido.', '#co-pickup');
+    if (CO.mode === 'delivery' && !coAddress.value.trim()) return showCoError('Escribe tu dirección de entrega y alguna referencia.', '#co-address');
+    if (!CO.pay) return showCoError('Elige cómo vas a pagar.', '#co-pay');
+    return true;
+  }
+
+  const placeText = () => { const o = pickupOptions(monterreyNow()).find((x) => x.id === CO.place); return o ? o.label : ''; };
+  orderDetailsFn = () => {
+    const name = coName.value.trim();
+    const d = CO.mode === 'delivery';
+    const payLabel = { cash: d ? 'Efectivo (al recibir)' : 'Efectivo (al recoger)', card: d ? 'Tarjeta (favor de llevar la terminal)' : 'Tarjeta (con terminal al recoger)', transfer: 'Transferencia (mando mi comprobante por aquí)' }[CO.pay] || '';
+    const lines = [d ? 'Entrega: A domicilio (el envío se cobra por separado)' : `Entrega: Recoger en ${placeText()}`];
+    if (d) lines.push(`Dirección: ${coAddress.value.trim()}`);
+    lines.push(`Pago: ${payLabel}`);
+    return {
+      intro: name ? `Soy ${name}. ` : '',
+      lines,
+      closing: d ? '¿Me confirman el costo del envío y el tiempo de entrega? ¡Gracias!' : '¿Me confirman a qué hora puedo pasar? ¡Gracias!',
+      short: `${d ? 'A domicilio' : `Recoger en ${placeText()}`} · ${{ cash: 'Efectivo', card: 'Tarjeta', transfer: 'Transferencia' }[CO.pay] || ''}`
+    };
+  };
+
+  function resetCheckout() {
+    CO.mode = ''; CO.place = ''; CO.pay = '';
+    coAddress.value = '';
+    store.set(ADDR_KEY, '');
+    $('#co-error').hidden = true;
+    renderCheckout();
+  }
+
+  $('#checkout').addEventListener('change', (e) => {
+    const t = e.target;
+    if (t.name === 'co-mode') { CO.mode = t.value; if (CO.mode === 'delivery') CO.place = ''; }
+    else if (t.name === 'co-place') CO.place = t.value;
+    else if (t.name === 'co-pay') CO.pay = t.value;
+    else return;
+    $('#co-error').hidden = true;
+    renderCheckout();
+  });
+  $('#checkout').addEventListener('click', (e) => {
+    const c = e.target.closest('[data-copy]');
+    if (!c) return;
+    const v = c.dataset.copy;
+    (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => toast('CLABE copiada ✅'), () => toast(`CLABE: ${v}`));
+  });
+  coName.addEventListener('input', () => { store.set(NAME_KEY, coName.value); $('#co-error').hidden = true; });
+  coAddress.addEventListener('input', () => { store.set(ADDR_KEY, coAddress.value); $('#co-error').hidden = true; });
+
+  onCartRender = renderCheckout;
+  renderPuestos();
+  renderCheckout();
+  setInterval(() => { renderPuestos(); renderCheckout(); }, 60000);
 
   /* ------------------------------------------------------------------------
      11 · HERO: VIDEO ALEATORIO A PANTALLA COMPLETA CONTROLADO POR SCROLL
@@ -987,7 +1216,8 @@
       first = from[Math.floor(Math.random() * from.length)];
     }
     const ordered = [first, ...list.filter((v) => v !== first)];
-    const isMobile = window.matchMedia && window.matchMedia(CONFIG.mobileQuery).matches;
+    // Celular = pantalla angosta, o el aparato mismo es de pantalla chica (aunque el navegador pida "sitio de escritorio")
+    const isMobile = (window.matchMedia && window.matchMedia(CONFIG.mobileQuery).matches) || Math.min(screen.width, screen.height) <= 600;
     if (!isMobile) return ordered;
     // En celular: primero el video _cel; si no existe, se usa el de computadora como respaldo
     return ordered.flatMap((v) => (v.srcMobile ? [{ ...v, src: v.srcMobile }, v] : [v]));
@@ -1004,14 +1234,15 @@
     videoLoading.classList.remove('is-done');
     const token = ++heroState.token;
     const stale = () => token !== heroState.token;
-    const fail = (why) => { if (stale()) return; cleanup(); console.info(`[Yukis Kikis] ${v.src}: ${why}`); startHeroVideo(i + 1); };
+    const fail = (why) => { if (stale()) return; cleanup(); console.warn(`[Yukis Kikis] No se pudo usar ${v.src}: ${why}`); startHeroVideo(i + 1); };
 
     if (v.poster) { video.poster = v.poster; videoFallback.src = v.poster; }
     else if (!videoFallback.getAttribute('src')) { videoFallback.src = (CONFIG.heroVideos.find((x) => x.poster) || {}).poster || ''; }
 
-    let src = v.src;
+    const url = `${v.src}?v=${CONFIG.video.version}`;
+    let src = url;
     try {                                          // descarga completa a memoria (con file:// no se puede y se usa la ruta directa)
-      const res = await fetch(v.src, { cache: 'force-cache' });
+      const res = await fetch(url, { cache: 'default' });
       if (stale()) return;
       if (!res.ok) { fail(`HTTP ${res.status}`); return; }
       const blob = await res.blob();
