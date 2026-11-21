@@ -960,6 +960,9 @@
     const live = ov && ov.date === monterreyDate() ? ov : null;
     const avail = live && typeof live.available === 'boolean' ? live.available : s.available;
     const note = (live && live.note) || s.note;
+    if (live && live.forceOpen && avail !== false) {
+      return { code: 'open', tone: 'open', pickup: true, chip: 'Abierto ahora', text: note || '¡Ya estamos instalados y abiertos! Ven por tu antojo.' };
+    }
     if (avail === false) {
       return { code: 'weather', tone: 'closed', pickup: false, chip: 'No instalado hoy',
         text: note || 'Hoy no pudimos instalarnos por el clima o un imprevisto. ¡Gracias por tu comprensión, pronto nos vemos! 💙' };
@@ -970,20 +973,24 @@
   }
 
   function localState(now) {
-    const open = now.day !== CONFIG.closedDay && now.minutes >= CONFIG.openMinutes && now.minutes < CONFIG.closeMinutes;
-    return { open, text: open ? 'Abierto ahora' : `Cerrado ahora · abrimos ${nextOpening(now)}` };
+    let open = now.day !== CONFIG.closedDay && now.minutes >= CONFIG.openMinutes && now.minutes < CONFIG.closeMinutes;
+    const ov = REMOTE.puestos.local;
+    const live = ov && ov.date === monterreyDate() ? ov : null;
+    if (live && live.forceOpen) return { open: true, text: 'Abierto ahora', note: live.note || '' };
+    if (live && live.available === false) return { open: false, text: 'Cerrado por hoy', note: live.note || '' };
+    return { open, text: open ? 'Abierto ahora' : `Cerrado ahora · abrimos ${nextOpening(now)}`, note: live ? live.note || '' : '' };
   }
 
   function renderPuestos() {
     const grid = $('#puestos-grid');
     if (!grid) return;
     const now = monterreyNow();
+    const loc = localState(now);
 
     /* Aviso de hoy */
     const today = PUESTOS.map((s) => ({ s, st: stallState(s, now) })).filter((x) => x.s.day === now.day);
     const open = today.filter((x) => x.st.code === 'open');
     const later = today.filter((x) => x.st.code === 'later');
-    const loc = localState(now);
     let tone = 'idle', msg;
     if (!today.length) {
       msg = `Hoy no tenemos puesto en el mercado. ${loc.open ? '¡Pero nuestro local sí está abierto!' : 'Revisa nuestro horario para visitarnos en el local.'}`;
@@ -1007,7 +1014,12 @@
       PUESTOS.filter((s) => s.day === d).forEach((s) => { if (!byMarket.has(s.market)) byMarket.set(s.market, []); byMarket.get(s.market).push(s); });
       byMarket.forEach((stalls, market) => groups.push({ d, idx, market, stalls }));
     });
-    grid.innerHTML = groups.map((g) => {
+    const localCard = `<article class="puesto-card is-today"><header><span class="puesto-day">Hoy · ${capital(DAY_NAMES[now.day])}</span><h3>Nuestro local</h3></header><ul class="puesto-list"><li class="puesto tone-${loc.open ? 'open' : 'closed'}">
+          <div class="puesto-top"><b>Av. de los Astros 1305</b><span class="st-chip tone-${loc.open ? 'open' : 'closed'}">${esc(loc.open ? 'Abierto ahora' : loc.text)}</span></div>
+          <p class="puesto-line"><i class="fa-regular fa-clock" aria-hidden="true"></i> Martes a domingo · ${esc(fmtTime(CONFIG.openMinutes))} – ${esc(fmtTime(CONFIG.closeMinutes))}</p>
+          ${loc.note ? `<p class="puesto-msg">${esc(loc.note)}</p>` : ''}
+          <a class="puesto-map" href="${esc(CONFIG.maps)}" target="_blank" rel="noopener">Cómo llegar <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></li></ul></article>`;
+    grid.innerHTML = localCard + groups.map((g) => {
       const label = g.idx === 0 ? `Hoy · ${capital(DAY_NAMES[g.d])}` : g.idx === 1 ? `Mañana · ${capital(DAY_NAMES[g.d])}` : capital(DAY_NAMES[g.d]);
       const items = g.stalls.map((s) => {
         const st = stallState(s, now);

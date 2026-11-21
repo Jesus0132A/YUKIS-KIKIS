@@ -12,13 +12,19 @@ PASO 1 - Firebase (consola de Firebase, proyecto "yukis-kikis")
      (ej. TUUSUARIO.github.io).
 
 PASO 2 - Subir archivos a GitHub (mismo repositorio de la página)
+  ESTRUCTURA FINAL (cada index.html es distinto, NO los mezcles):
+     /index.html          <- la página de clientes (el index.html que está FUERA de la carpeta admin)
+     /styles.css  /app.js  /puestos.js
+     /admin/panel.html    <- el panel (ya NO se llama index.html)
+     /admin/admin.js  admin.css  sw.js  manifest.webmanifest  y los 4 iconos .png
+  Si antes subiste el index.html del panel encima del de la página, vuelve a subir el index.html principal del zip.
   - Reemplaza: index.html, styles.css, app.js
   - Sube la carpeta nueva completa: admin/  (index.html, admin.js, admin.css, sw.js, manifest.webmanifest, iconos)
   - puestos.js se queda igual (el panel lo usa para la lista de puestos).
   - firestore.rules no hace falta subirlo (solo pegarlo en Firebase).
 
 PASO 3 - Instalar la app en el celular
-  - Abre en el celular: https://TUUSUARIO.github.io/TU-REPO/admin/
+  - Abre en el celular: https://TUUSUARIO.github.io/TU-REPO/admin/panel.html
   - Android (Chrome): menú ⋮ > "Instalar app" / "Agregar a pantalla de inicio".
   - iPhone (Safari): botón Compartir > "Agregar a pantalla de inicio".
   - Entra con tu correo y contraseña.
@@ -26,7 +32,7 @@ PASO 3 - Instalar la app en el celular
 QUE HACE
   Pedidos: llegan en vivo (sonido + aviso), estados Nuevo/Preparando/Listo/Entregado, editar productos y
            cantidades, envío/ajuste, pagado, notas internas, cancelar con motivo.
-  Puestos: botón Abierto / Cerrado hoy (con mensaje opcional). Se refleja en la página y se reinicia solo mañana.
+  Puestos: el local y cada puesto de hoy con 3 botones: Abrir ya (si llegas antes de hora) / Cerrado hoy / Horario (automático). Mensaje opcional. Se refleja en la página y se reinicia solo mañana.
   Precios: cambia cualquier precio; la página lo toma en menos de 1 minuto.
   Más:     aviso en barra amarilla de la página, sonido, ver página, cerrar sesión.
 

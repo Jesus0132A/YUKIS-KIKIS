@@ -1,0 +1,42 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Solo tú (con este correo) puedes administrar.
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email in ['angelpalomino72.ap@gmail.com'];
+    }
+
+    // Un pedido nuevo desde la página pública debe tener esta forma.
+    function validOrder() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['code','createdAt','date','name','mode','placeId','place','address','pay','items','subtotal','total','notes','status','source'])
+        && d.keys().hasAll(['code','createdAt','items','total','status'])
+        && d.status == 'nuevo'
+        && d.source == 'web'
+        && d.code is string && d.code.size() >= 4 && d.code.size() <= 10
+        && d.createdAt is int
+        && d.name is string && d.name.size() <= 60
+        && d.items is list && d.items.size() >= 1 && d.items.size() <= 30
+        && d.total is number && d.total >= 0 && d.total <= 20000;
+    }
+
+    // Precios, puestos y aviso: cualquiera los lee (la página), solo tú los cambias.
+    match /config/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Pedidos: la página puede crear (con el id = código del pedido); solo tú lees y modificas.
+    match /orders/{code} {
+      allow create: if validOrder() && code == request.resource.data.code;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Etapa 2 (estadísticas / venta rápida)
+    match /sales/{id} {
+      allow read, write: if isAdmin();
+    }
+  }
+}
