@@ -19,7 +19,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const TZ = 'America/Monterrey';
-const SITE_URL = '../index.html';
+const SITE_URL = location.pathname.includes('/admin/') ? './index.html' : './index.html';
 const PUESTOS = Array.isArray(window.YK_PUESTOS) ? window.YK_PUESTOS : [];
 const DAY_NAMES = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
 const STATUSES = [['nuevo', 'Nuevo'], ['preparando', 'Preparando'], ['listo', 'Listo'], ['entregado', 'Entregado']];
