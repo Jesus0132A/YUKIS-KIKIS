@@ -1,0 +1,17 @@
+{
+  "name": "Yukis Kikis · Panel",
+  "short_name": "YK Panel",
+  "description": "Panel de administración de Yukis Kikis",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F9F6EF",
+  "theme_color": "#0038E2",
+  "lang": "es-MX",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
